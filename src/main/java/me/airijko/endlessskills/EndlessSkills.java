@@ -1,8 +1,16 @@
 package me.airijko.endlessskills;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import me.airijko.endlessskills.managers.PlayerDataManager;
+import me.airijko.endlessskills.listeners.PlayerEventListener;
+import me.airijko.endlessskills.leveling.XPConfiguration;
+import me.airijko.endlessskills.leveling.LevelingManager;
+import me.airijko.endlessskills.leveling.LevelThresholdCalculator;
+import me.airijko.endlessskills.commands.ReloadCommand;
 
+import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.logging.Level;
 
 public final class EndlessSkills extends JavaPlugin {
@@ -16,9 +24,16 @@ public final class EndlessSkills extends JavaPlugin {
             return; // Exit the method if the folder cannot be created
         }
 
-        // Register your event listeners here
-        getServer().getPluginManager().registerEvents(new MobKillListener(this), this);
+        PlayerDataManager playerDataManager = new PlayerDataManager(this);
+        XPConfiguration xpConfiguration = new XPConfiguration(this);
+        LevelThresholdCalculator levelThresholdCalculator = new LevelThresholdCalculator(this);
+        LevelingManager levelUpManager = new LevelingManager(playerDataManager, levelThresholdCalculator);
+        getServer().getPluginManager().registerEvents(new PlayerEventListener(playerDataManager, xpConfiguration, levelUpManager), this);
+
+        // Reload Command
+        this.getCommand("endless").setExecutor(new ReloadCommand(this, xpConfiguration, levelThresholdCalculator));
     }
+
 
     @Override
     public void onDisable() {
