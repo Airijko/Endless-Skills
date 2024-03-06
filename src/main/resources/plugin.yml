@@ -1,0 +1,4 @@
+name: EndlessSkills
+version: '${project.version}'
+main: me.airijko.endlessskills.EndlessSkills
+api-version: '1.20'
