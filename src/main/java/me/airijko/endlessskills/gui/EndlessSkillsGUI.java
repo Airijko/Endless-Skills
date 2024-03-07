@@ -1,14 +1,13 @@
 package me.airijko.endlessskills.gui;
 
 import me.airijko.endlessskills.managers.PlayerDataManager;
+import me.airijko.endlessskills.skills.PlayerAttributeModifier;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -19,14 +18,12 @@ import java.util.Collections;
 
 public class EndlessSkillsGUI implements Listener {
     private final PlayerDataManager playerDataManager;
-    private final JavaPlugin plugin;
 
     public EndlessSkillsGUI(PlayerDataManager playerDataManager, JavaPlugin plugin) {
         this.playerDataManager = playerDataManager;
-        this.plugin = plugin;
 
         // Register the listener in the constructor
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerAttributeModifier(), plugin);
     }
 
     public Inventory openGUI(Player player) {
@@ -58,15 +55,5 @@ public class EndlessSkillsGUI implements Listener {
             woolItem.setItemMeta(meta);
         }
         gui.addItem(woolItem);
-    }
-
-    // Add the InventoryClickEvent handler
-    @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
-        // Check if the clicked inventory is the one you created
-        if (event.getInventory().equals(event.getWhoClicked().getOpenInventory().getTopInventory())) {
-            // Cancel the event to prevent item interaction
-            event.setCancelled(true);
-        }
     }
 }
