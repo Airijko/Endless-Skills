@@ -9,26 +9,30 @@ import org.bukkit.ChatColor;
 public class LevelingManager {
 
     private final PlayerDataManager playerDataManager;
-    private final LevelThresholdCalculator levelThresholdCalculator;
+    private final LevelConfiguration levelConfiguration;
 
-    public LevelingManager(PlayerDataManager playerDataManager, LevelThresholdCalculator levelThresholdCalculator) {
+    public LevelingManager(PlayerDataManager playerDataManager, LevelConfiguration levelConfiguration) {
         this.playerDataManager = playerDataManager;
-        this.levelThresholdCalculator = levelThresholdCalculator;
+        this.levelConfiguration = levelConfiguration;
     }
 
     private void displayLevelUpMessage(Player player, int newLevel) {
         int nextLevel = newLevel + 1;
-        double correctNextLevelThreshold = levelThresholdCalculator.calculateThreshold(nextLevel);
+        double nextLevelThreshold = levelConfiguration.calculateThreshold(nextLevel);
 
-        player.sendMessage(ChatColor.GREEN + "Congratulations! You have leveled up to " + ChatColor.BOLD + "Level " + newLevel + ChatColor.RESET + ". You need " + (int)correctNextLevelThreshold + " XP towards your next level.");
-        Bukkit.broadcastMessage(ChatColor.GOLD.toString() + ChatColor.BOLD + player.getName() + ChatColor.RESET + ChatColor.YELLOW + " has leveled up to " + ChatColor.BOLD + "Level " + newLevel + ChatColor.RESET + "!");
+        // Retrieve the skill points to add from the configuration
+        int skillPointsToAdd = levelConfiguration.getSkillPointsPerLevel();
+
+        // Display the level-up message including the skill points gained
+        player.sendMessage(ChatColor.GREEN + "Congratulations! You have leveled up to " + ChatColor.BOLD + "Level " + newLevel + ChatColor.RESET + ". You need " + (int)nextLevelThreshold + " XP towards your next level. You have gained " + ChatColor.BOLD + skillPointsToAdd + ChatColor.RESET + " skill points!");
+        Bukkit.broadcastMessage(ChatColor.GOLD.toString() + ChatColor.BOLD + player.getName() + ChatColor.RESET + ChatColor.YELLOW + " has leveled up to " + ChatColor.BOLD + "Level " + newLevel);
     }
 
     public boolean checkForLevelUp(Player player) {
         UUID playerUUID = player.getUniqueId();
         int currentXP = playerDataManager.getPlayerXP(playerUUID);
         int currentLevel = playerDataManager.getPlayerLevel(playerUUID);
-        double xpForNextLevel = levelThresholdCalculator.calculateThreshold(currentLevel + 1);
+        double xpForNextLevel = levelConfiguration.calculateThreshold(currentLevel + 1);
 
         // Check if the player has enough XP to level up
         if (currentXP >= xpForNextLevel) {
@@ -37,6 +41,13 @@ public class LevelingManager {
 
             // Calculate the excess XP
             int excessXP = (int) (currentXP - xpForNextLevel);
+
+            // Retrieve the skill points to add from the configuration
+            int skillPointsToAdd = levelConfiguration.getSkillPointsPerLevel();
+
+            // Update the player's skill points
+            int currentSkillPoints = playerDataManager.getPlayerSkillPoints(playerUUID);
+            playerDataManager.setPlayerSkillPoints(playerUUID, currentSkillPoints + skillPointsToAdd);
 
             // Reset the player's XP to 0 and add the excess XP
             playerDataManager.setPlayerXP(playerUUID, excessXP);
@@ -49,6 +60,7 @@ public class LevelingManager {
 
         return false; // Indicate that the player has not leveled up
     }
+
 
     private void displayXPGainedMessage(Player player, int newXP, double xpThresholdForNextLevel) {
         player.sendMessage(ChatColor.GREEN + "Current XP: "  + newXP + " / " + (int)xpThresholdForNextLevel);
@@ -69,7 +81,7 @@ public class LevelingManager {
         if (!hasLeveledUp) {
             // Calculate the current level and the threshold for the next level
             int currentLevel = playerDataManager.getPlayerLevel(playerUUID);
-            double xpThresholdForNextLevel = levelThresholdCalculator.calculateThreshold(currentLevel + 1);
+            double xpThresholdForNextLevel = levelConfiguration.calculateThreshold(currentLevel + 1);
 
             // Correctly call the displayXPGainedMessage method with matching parameters
             displayXPGainedMessage(player, newXP, xpThresholdForNextLevel);

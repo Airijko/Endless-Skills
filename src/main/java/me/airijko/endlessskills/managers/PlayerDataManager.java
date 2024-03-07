@@ -34,9 +34,9 @@ public class PlayerDataManager {
                 Player player = Bukkit.getPlayer(playerUUID);
                 String playerName = player != null ? player.getName() : "Unknown Player"; // Add an empty string for player name
                 playerDataConfig.set("PlayerName", playerName);
-                playerDataConfig.set("Mob Kill Count", 0);
                 playerDataConfig.set("XP", 0);
                 playerDataConfig.set("Level", 1);
+                playerDataConfig.set("Skill_Points", 5);
                 playerDataConfig.save(playerDataFile);
             } catch (IOException e) {
                 plugin.getLogger().log(Level.SEVERE, "Failed to save player data", e);
@@ -73,6 +73,24 @@ public class PlayerDataManager {
         File playerDataFile = getPlayerDataFile(playerUUID);
         YamlConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
         playerDataConfig.set("XP", xp);
+        try {
+            playerDataConfig.save(playerDataFile);
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to save player data", e);
+        }
+    }
+
+    public int getPlayerSkillPoints(UUID playerUUID) {
+        File playerDataFile = getPlayerDataFile(playerUUID);
+        YamlConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
+        return playerDataConfig.getInt("Skill_Points", 5); // Default to 5 if "Skill_Points" is not set
+    }
+
+    // Method to set the player's skill points
+    public void setPlayerSkillPoints(UUID playerUUID, int skillPoints) {
+        File playerDataFile = getPlayerDataFile(playerUUID);
+        YamlConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
+        playerDataConfig.set("Skill_Points", skillPoints);
         try {
             playerDataConfig.save(playerDataFile);
         } catch (IOException e) {

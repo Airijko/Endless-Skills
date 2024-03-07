@@ -6,18 +6,18 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.airijko.endlessskills.leveling.XPConfiguration;
-import me.airijko.endlessskills.leveling.LevelThresholdCalculator;
+import me.airijko.endlessskills.leveling.LevelConfiguration;
 
 public class ReloadCommand implements CommandExecutor {
 
     private final JavaPlugin plugin;
     private final XPConfiguration xpConfiguration;
-    private final LevelThresholdCalculator levelThresholdCalculator;
+    private final LevelConfiguration levelConfiguration;
 
-    public ReloadCommand(JavaPlugin plugin, XPConfiguration xpConfiguration, LevelThresholdCalculator levelThresholdCalculator) {
+    public ReloadCommand(JavaPlugin plugin, XPConfiguration xpConfiguration, LevelConfiguration levelConfiguration) {
         this.plugin = plugin;
         this.xpConfiguration = xpConfiguration;
-        this.levelThresholdCalculator = levelThresholdCalculator;
+        this.levelConfiguration = levelConfiguration;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class ReloadCommand implements CommandExecutor {
                 // Reload the XP configuration
                 xpConfiguration.loadXPConfiguration();
                 // Reload the leveling formula configuration
-                levelThresholdCalculator.loadLevelingFormula();
+                levelConfiguration.loadLevelingFormula();
 
                 sender.sendMessage("EndlessSkills configuration has been reloaded!");
                 return true;
