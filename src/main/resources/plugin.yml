@@ -4,5 +4,5 @@ main: me.airijko.endlessskills.EndlessSkills
 api-version: '1.20'
 commands:
   endless:
-    description: Reloads the EndlessSkills plugin or opens the Endless Skills GUI
-    usage: /<command> [reload|skills]
+    description: Main command for EndlessSkills plugin.
+    usage: /<command> [reload|skills|resetattributes]

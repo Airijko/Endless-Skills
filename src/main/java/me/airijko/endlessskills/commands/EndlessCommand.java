@@ -1,7 +1,7 @@
 package me.airijko.endlessskills.commands;
 
 import me.airijko.endlessskills.gui.EndlessSkillsGUI;
-import me.airijko.endlessskills.commands.ReloadCommand;
+import me.airijko.endlessskills.commands.ResetAttributesCommand;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,10 +13,12 @@ public class EndlessCommand implements CommandExecutor {
 
     private final EndlessSkillsGUI gui;
     private final ReloadCommand reloadCommand; // Reference to the ReloadCommand class
+    private final ResetAttributesCommand resetAttributesCommand;
 
-    public EndlessCommand(EndlessSkillsGUI gui, ReloadCommand reloadCommand) {
+    public EndlessCommand(EndlessSkillsGUI gui, ReloadCommand reloadCommand, ResetAttributesCommand resetAttributesCommand) {
         this.gui = gui;
         this.reloadCommand = reloadCommand;
+        this.resetAttributesCommand = resetAttributesCommand;
     }
 
     @Override
@@ -31,10 +33,13 @@ public class EndlessCommand implements CommandExecutor {
                 } else if (subCommand.equals("skills")) {
                     gui.openGUI(player);
                     return true;
+                } else if (subCommand.equals("resetattributes")) {
+                    // Execute the ResetAttributesCommand
+                    return resetAttributesCommand.onCommand(sender, command, label, args);
                 }
             }
         }
-        sender.sendMessage(ChatColor.RED + "Usage: /endless [reload|skills]");
+        sender.sendMessage(ChatColor.RED + "Usage: /endless [reload|skills|resetattributes]");
         return false;
     }
 }

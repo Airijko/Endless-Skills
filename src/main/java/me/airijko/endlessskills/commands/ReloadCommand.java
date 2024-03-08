@@ -27,7 +27,7 @@ public class ReloadCommand implements CommandExecutor {
                 // Reload the XP configuration
                 xpConfiguration.loadXPConfiguration();
                 // Reload the leveling formula configuration
-                levelConfiguration.loadLevelingFormula();
+                levelConfiguration.loadLevelingConfiguration();
 
                 sender.sendMessage("EndlessSkills configuration has been reloaded!");
                 return true;

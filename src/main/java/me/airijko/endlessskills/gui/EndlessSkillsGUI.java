@@ -1,29 +1,24 @@
 package me.airijko.endlessskills.gui;
 
 import me.airijko.endlessskills.managers.PlayerDataManager;
-import me.airijko.endlessskills.skills.PlayerAttributeModifier;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collections;
 
 
-public class EndlessSkillsGUI implements Listener {
+public class EndlessSkillsGUI {
     private final PlayerDataManager playerDataManager;
+    private Inventory gui;
 
-    public EndlessSkillsGUI(PlayerDataManager playerDataManager, JavaPlugin plugin) {
+    public EndlessSkillsGUI(PlayerDataManager playerDataManager) {
         this.playerDataManager = playerDataManager;
-
-        // Register the listener in the constructor
-        Bukkit.getPluginManager().registerEvents(new PlayerAttributeModifier(), plugin);
     }
 
     public Inventory openGUI(Player player) {
@@ -31,7 +26,7 @@ public class EndlessSkillsGUI implements Listener {
         int totalSkillPoints = playerDataManager.getPlayerSkillPoints(player.getUniqueId());
 
         // Create a new inventory with 9 slots (1 row)
-        Inventory gui = Bukkit.createInventory(null, 9, ChatColor.RED.toString() + ChatColor.BOLD + "Endless Skills" + ChatColor.BLACK + " - " + totalSkillPoints + " SP");
+        gui = Bukkit.createInventory(null, 9, "Endless Skills");
 
         // Create wool items for different skill points
         addWoolItem(gui, Material.RED_WOOL, ChatColor.RED + "Life Force", ChatColor.GRAY + "NULL");
@@ -40,10 +35,23 @@ public class EndlessSkillsGUI implements Listener {
         addWoolItem(gui, Material.LIME_WOOL, ChatColor.GREEN + "Haste", ChatColor.GRAY + "NULL");
         addWoolItem(gui, Material.LIGHT_BLUE_WOOL, ChatColor.AQUA + "Focus", ChatColor.GRAY + "NULL");
 
+        ItemStack netherStar = new ItemStack(Material.NETHER_STAR);
+        ItemMeta netherStarMeta = netherStar.getItemMeta();
+        if (netherStarMeta != null) {
+            netherStarMeta.setDisplayName(ChatColor.GOLD + "Total Skill Points: " + totalSkillPoints);
+            netherStar.setItemMeta(netherStarMeta);
+        }
+
+        gui.setItem(8, netherStar);
+
         // Open the GUI for the player
         player.openInventory(gui);
 
         return gui; // Return the Inventory instance
+    }
+
+    public Inventory getInventory() {
+        return gui;
     }
 
     private void addWoolItem(Inventory gui, Material woolType, String displayName, String description) {

@@ -2,7 +2,9 @@ package me.airijko.endlessskills.leveling;
 
 import me.airijko.endlessskills.managers.PlayerDataManager;
 import org.bukkit.entity.Player;
+
 import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
@@ -24,7 +26,7 @@ public class LevelingManager {
         int skillPointsToAdd = levelConfiguration.getSkillPointsPerLevel();
 
         // Display the level-up message including the skill points gained
-        player.sendMessage(ChatColor.GREEN + "Congratulations! You have leveled up to " + ChatColor.BOLD + "Level " + newLevel + ChatColor.RESET + ". You need " + (int)nextLevelThreshold + " XP towards your next level. You have gained " + ChatColor.BOLD + skillPointsToAdd + ChatColor.RESET + " skill points!");
+        player.sendMessage(ChatColor.GREEN + "Congratulations! You have leveled up to " + ChatColor.BOLD + "Level " + newLevel + ChatColor.RESET + ". You need " + (int) nextLevelThreshold + " XP towards your next level. You have gained " + ChatColor.BOLD + skillPointsToAdd + ChatColor.RESET + " skill points!");
         Bukkit.broadcastMessage(ChatColor.GOLD.toString() + ChatColor.BOLD + player.getName() + ChatColor.RESET + ChatColor.YELLOW + " has leveled up to " + ChatColor.BOLD + "Level " + newLevel);
     }
 
@@ -63,7 +65,7 @@ public class LevelingManager {
 
 
     private void displayXPGainedMessage(Player player, int newXP, double xpThresholdForNextLevel) {
-        player.sendMessage(ChatColor.GREEN + "Current XP: "  + newXP + " / " + (int)xpThresholdForNextLevel);
+        player.sendMessage(ChatColor.GREEN + "Current XP: " + newXP + " / " + (int) xpThresholdForNextLevel);
     }
 
     public void addXP(Player player, int xpToAdd) {

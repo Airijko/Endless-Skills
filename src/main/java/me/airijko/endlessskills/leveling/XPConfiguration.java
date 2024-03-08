@@ -2,6 +2,7 @@ package me.airijko.endlessskills.leveling;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.YamlConfiguration;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

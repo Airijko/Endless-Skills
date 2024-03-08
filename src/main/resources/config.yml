@@ -1,0 +1,11 @@
+# TEST
+skill_attributes:
+  life_force: 1.0
+  strength: 0.5
+  tenacity:
+    knock_back_resistance: 0.005
+    toughnesss: 0.15
+  haste:
+    attack_speed: 0.04
+    movement_speed: 0.001
+

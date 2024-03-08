@@ -11,32 +11,44 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 public class PlayerDataManager {
-
     private final JavaPlugin plugin;
 
     public PlayerDataManager(JavaPlugin plugin) {
         this.plugin = plugin;
+        loadPlayerDataFolder();
     }
 
+    public void loadPlayerDataFolder() {
+        File playerDataFolder = new File(plugin.getDataFolder(), "playerdata");
+        if (!playerDataFolder.exists()) {
+            if (!playerDataFolder.mkdir()) {
+                plugin.getLogger().log(Level.SEVERE, "Failed to create the playerdata folder.");
+            }
+        }
+    }
     public File getPlayerDataFile(UUID playerUUID) {
         File playerDataFolder = new File(plugin.getDataFolder(), "playerdata");
         if (!playerDataFolder.exists()) {
-            // Ignore the return value by not assigning it to a variable
             playerDataFolder.mkdir();
         }
         File playerDataFile = new File(playerDataFolder, playerUUID.toString() + ".yml");
         if (!playerDataFile.exists()) {
             try {
-                // Ignore the return value by not assigning it to a variable
                 playerDataFile.createNewFile();
                 YamlConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
                 playerDataConfig.set("UUID", playerUUID.toString());
                 Player player = Bukkit.getPlayer(playerUUID);
-                String playerName = player != null ? player.getName() : "Unknown Player"; // Add an empty string for player name
+                String playerName = player != null ? player.getName() : "Unknown Player";
                 playerDataConfig.set("PlayerName", playerName);
                 playerDataConfig.set("XP", 0);
                 playerDataConfig.set("Level", 1);
                 playerDataConfig.set("Skill_Points", 5);
+                playerDataConfig.createSection("Attributes");
+                playerDataConfig.set("Attributes.Life_Force", 1);
+                playerDataConfig.set("Attributes.Strength", 1);
+                playerDataConfig.set("Attributes.Tenacity", 1);
+                playerDataConfig.set("Attributes.Haste", 1);
+                playerDataConfig.set("Attributes.Focus", 1);
                 playerDataConfig.save(playerDataFile);
             } catch (IOException e) {
                 plugin.getLogger().log(Level.SEVERE, "Failed to save player data", e);

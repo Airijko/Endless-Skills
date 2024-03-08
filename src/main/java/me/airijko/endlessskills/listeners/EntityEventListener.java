@@ -2,36 +2,24 @@ package me.airijko.endlessskills.listeners;
 
 import me.airijko.endlessskills.leveling.LevelingManager;
 import me.airijko.endlessskills.leveling.XPConfiguration;
-import me.airijko.endlessskills.managers.PlayerDataManager;
-
-import java.util.UUID;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-public class PlayerEventListener implements Listener {
 
-    private final PlayerDataManager playerDataManager;
+public class EntityEventListener implements Listener {
+
     private final XPConfiguration xpConfiguration;
     private final LevelingManager levelingManager;
 
-    public PlayerEventListener(PlayerDataManager playerDataManager, XPConfiguration xpConfiguration, LevelingManager levelingManager) {
-        this.playerDataManager = playerDataManager;
+    public EntityEventListener(XPConfiguration xpConfiguration, LevelingManager levelingManager) {
         this.xpConfiguration = xpConfiguration;
         this.levelingManager = levelingManager;
-    }
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        UUID playerUUID = player.getUniqueId();
-        playerDataManager.getPlayerDataFile(playerUUID);
     }
 
     // New EntityDeathEvent handler for mob kills
@@ -53,4 +41,5 @@ public class PlayerEventListener implements Listener {
             }
         }
     }
+
 }
