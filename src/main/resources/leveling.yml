@@ -5,4 +5,4 @@ default:
   base: 10.0
 
 # Skill points gained per level
-skillPointsPerLevel: 5
+skillPointsPerLevel: 3

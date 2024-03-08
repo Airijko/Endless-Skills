@@ -26,11 +26,4 @@ public class ResetAttributesCommand implements CommandExecutor {
         player.sendMessage("Your attributes have been reset to their default values.");
         return true;
     }
-
-    private void resetAttribute(Player player, Attribute attribute, double defaultValue) {
-        AttributeInstance attributeInstance = player.getAttribute(attribute);
-        if (attributeInstance != null) {
-            attributeInstance.setBaseValue(defaultValue);
-        }
-    }
 }

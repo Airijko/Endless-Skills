@@ -1,7 +1,6 @@
 package me.airijko.endlessskills.commands;
 
 import me.airijko.endlessskills.gui.EndlessSkillsGUI;
-import me.airijko.endlessskills.commands.ResetAttributesCommand;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,7 +11,7 @@ import org.bukkit.ChatColor;
 public class EndlessCommand implements CommandExecutor {
 
     private final EndlessSkillsGUI gui;
-    private final ReloadCommand reloadCommand; // Reference to the ReloadCommand class
+    private final ReloadCommand reloadCommand;
     private final ResetAttributesCommand resetAttributesCommand;
 
     public EndlessCommand(EndlessSkillsGUI gui, ReloadCommand reloadCommand, ResetAttributesCommand resetAttributesCommand) {

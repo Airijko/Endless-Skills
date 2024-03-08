@@ -44,11 +44,11 @@ public class PlayerDataManager {
                 playerDataConfig.set("Level", 1);
                 playerDataConfig.set("Skill_Points", 5);
                 playerDataConfig.createSection("Attributes");
-                playerDataConfig.set("Attributes.Life_Force", 1);
-                playerDataConfig.set("Attributes.Strength", 1);
-                playerDataConfig.set("Attributes.Tenacity", 1);
-                playerDataConfig.set("Attributes.Haste", 1);
-                playerDataConfig.set("Attributes.Focus", 1);
+                playerDataConfig.set("Attributes.Life_Force", 0);
+                playerDataConfig.set("Attributes.Strength", 0);
+                playerDataConfig.set("Attributes.Tenacity", 0);
+                playerDataConfig.set("Attributes.Haste", 0);
+                playerDataConfig.set("Attributes.Focus", 0);
                 playerDataConfig.save(playerDataFile);
             } catch (IOException e) {
                 plugin.getLogger().log(Level.SEVERE, "Failed to save player data", e);

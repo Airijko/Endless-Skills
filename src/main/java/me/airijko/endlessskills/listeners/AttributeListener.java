@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.UUID;
@@ -31,29 +30,19 @@ public class AttributeListener implements Listener {
 
                 switch (displayName) {
                     case "Life Force":
-                        int Life_Force = skillAttributes.getAttributeLevel(playerUUID, "Life_Force");
-                        skillAttributes.setAttributeLevel(playerUUID, "Life_Force", Life_Force + 1);
-                        player.sendMessage("You've leveled up Life Force to level " + (Life_Force + 1));
+                        skillAttributes.useSkillPoint(playerUUID, "Life_Force");
                         break;
                     case "Strength":
-                        int Strength = skillAttributes.getAttributeLevel(playerUUID, "Strength");
-                        skillAttributes.setAttributeLevel(playerUUID, "Strength", Strength + 1);
-                        player.sendMessage("You've leveled up Strength to level " + (Strength + 1));
+                        skillAttributes.useSkillPoint(playerUUID, "Strength");
                         break;
                     case "Tenacity":
-                        int Tenacity = skillAttributes.getAttributeLevel(playerUUID, "Tenacity");
-                        skillAttributes.setAttributeLevel(playerUUID, "Tenacity", Tenacity + 1);
-                        player.sendMessage("You've leveled up Tenacity to level " + (Tenacity + 1));
+                        skillAttributes.useSkillPoint(playerUUID, "Tenacity");
                         break;
                     case "Haste":
-                        int Haste = skillAttributes.getAttributeLevel(playerUUID, "Haste");
-                        skillAttributes.setAttributeLevel(playerUUID, "Haste", Haste + 1);
-                        player.sendMessage("You've leveled up Haste to level " + (Haste + 1));
+                        skillAttributes.useSkillPoint(playerUUID, "Haste");
                         break;
                     case "Focus":
-                        int Focus = skillAttributes.getAttributeLevel(playerUUID, "Focus");
-                        skillAttributes.setAttributeLevel(playerUUID, "Focus", Focus + 1);
-                        player.sendMessage("You've leveled up Focus to level " + (Focus + 1));
+                        skillAttributes.useSkillPoint(playerUUID, "Focus");
                         break;
                 }
             }

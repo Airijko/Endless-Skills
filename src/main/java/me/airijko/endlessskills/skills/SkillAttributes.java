@@ -8,6 +8,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.ChatColor;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,8 +42,8 @@ public class SkillAttributes {
     }
 
     public void modifyTenacity(Player player, int level) {
-        double toughnessValue = plugin.getConfig().getDouble("skill_attributes.tenacity.toughness", 0.15) * level;
-        double knockbackResistanceValue = plugin.getConfig().getDouble("skill_attributes.tenacity.knock_back_resistance", 0.005) * level;
+        double toughnessValue = plugin.getConfig().getDouble("skill_attributes.tenacity.toughness", 0.0125) * level;
+        double knockbackResistanceValue = plugin.getConfig().getDouble("skill_attributes.tenacity.knock_back_resistance", 0.003) * level;
         AttributeInstance toughness = player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS);
         AttributeInstance knockbackResistance = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
         if (toughness != null) {
@@ -70,31 +71,36 @@ public class SkillAttributes {
         // Example for Focus, you might need a custom solution
     }
 
+    public void applyModifiers(Player player) {
+        UUID playerUUID = player.getUniqueId();
+
+        // Reset all attributes to default for the specific player
+        resetAllAttributesToDefault(player);
+
+        // Apply Life Force modifier
+        int lifeForceLevel = getAttributeLevel(playerUUID, "Life_Force");
+        modifyLifeForce(player, lifeForceLevel);
+
+        // Apply Strength modifier
+        int strengthLevel = getAttributeLevel(playerUUID, "Strength");
+        modifyStrength(player, strengthLevel);
+
+        // Apply Tenacity modifier
+        int tenacityLevel = getAttributeLevel(playerUUID, "Tenacity");
+        modifyTenacity(player, tenacityLevel);
+
+        // Apply Haste modifier
+        int hasteLevel = getAttributeLevel(playerUUID, "Haste");
+        modifyHaste(player, hasteLevel);
+
+        // Apply Focus modifier
+        int focusLevel = getAttributeLevel(playerUUID, "Focus");
+        modifyFocus(player, focusLevel);
+    }
+
     public void applyModifiersToAllPlayers() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            UUID playerUUID = player.getUniqueId();
-
-            resetAllAttributesToDefault(player);
-
-            // Apply Life Force modifier
-            int lifeForceLevel = getAttributeLevel(playerUUID, "Life_Force");
-            modifyLifeForce(player, lifeForceLevel);
-
-            // Apply Strength modifier
-            int strengthLevel = getAttributeLevel(playerUUID, "Strength");
-            modifyStrength(player, strengthLevel);
-
-            // Apply Tenacity modifier
-            int tenacityLevel = getAttributeLevel(playerUUID, "Tenacity");
-            modifyTenacity(player, tenacityLevel);
-
-            // Apply Haste modifier
-            int hasteLevel = getAttributeLevel(playerUUID, "Haste");
-            modifyHaste(player, hasteLevel);
-
-            // Apply Focus modifier
-            int focusLevel = getAttributeLevel(playerUUID, "Focus");
-            modifyFocus(player, focusLevel);
+            applyModifiers(player);
         }
     }
 
@@ -112,6 +118,34 @@ public class SkillAttributes {
         resetAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, 0.1); // Default movement speed
         resetAttribute(player, Attribute.GENERIC_ATTACK_SPEED, 4.0); // Default attack speed
     }
+
+    public void useSkillPoint(UUID playerUUID, String attributeName) {
+        // Retrieve the current skill points for the player
+        int currentSkillPoints = playerDataManager.getPlayerSkillPoints(playerUUID);
+
+        // Check if the player has enough skill points to level up the attribute
+        if (currentSkillPoints > 0) {
+            // Subtract one skill point
+            playerDataManager.setPlayerSkillPoints(playerUUID, currentSkillPoints - 1);
+
+            // Increase the attribute level by 1
+            int currentAttributeLevel = getAttributeLevel(playerUUID, attributeName);
+            setAttributeLevel(playerUUID, attributeName, currentAttributeLevel + 1);
+
+            // Optionally, send a message to the player indicating the attribute level has increased
+            Player player = Bukkit.getPlayer(playerUUID);
+            if (player != null) {
+                player.sendMessage(ChatColor.GREEN + "Leveled " + ChatColor.AQUA + attributeName + ChatColor.GREEN + " to " + ChatColor.AQUA + (currentAttributeLevel + 1) + ChatColor.GREEN + "!");
+            }
+        } else {
+            // Optionally, send a message to the player indicating they don't have enough skill points
+            Player player = Bukkit.getPlayer(playerUUID);
+            if (player != null) {
+                player.sendMessage(ChatColor.RED + "Not enough skill points to level up " + ChatColor.AQUA + attributeName + ChatColor.RED + ".");
+            }
+        }
+    }
+
 
     // Method to get the level of a specific attribute
     public int getAttributeLevel(UUID playerUUID, String attributeName) {
