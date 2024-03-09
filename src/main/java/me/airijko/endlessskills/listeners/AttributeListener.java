@@ -39,7 +39,6 @@ public class AttributeListener implements Listener {
                     String displayName = ChatColor.stripColor(itemMeta.getDisplayName());
                     Player player = (Player) event.getWhoClicked();
                     UUID playerUUID = player.getUniqueId();
-                    System.out.println("Clicked player's ATTRIBUTE");
 
                     switch (displayName) {
                         case "Life Force":

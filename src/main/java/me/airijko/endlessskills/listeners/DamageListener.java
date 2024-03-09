@@ -32,7 +32,6 @@ public class DamageListener implements Listener {
 
         // Check if the damager is a player
         if (damager instanceof Player) {
-            System.out.println("EntityDamageByEntityEvent triggered");
             Player player = (Player) damager;
             UUID playerUUID = player.getUniqueId();
             Entity entity = event.getEntity();
