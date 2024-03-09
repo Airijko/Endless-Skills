@@ -3,11 +3,13 @@ package me.airijko.endlessskills.commands;
 import me.airijko.endlessskills.gui.EndlessSkillsGUI;
 import me.airijko.endlessskills.leveling.LevelingManager;
 import me.airijko.endlessskills.managers.PlayerDataManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.ChatColor;
+import org.jetbrains.annotations.NotNull;
 
 public class EndlessCommand implements CommandExecutor {
 
@@ -24,24 +26,28 @@ public class EndlessCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (args.length > 0) {
                 String subCommand = args[0].toLowerCase();
-                if (subCommand.equals("reload")) {
-                    return reloadCommand.onCommand(sender, command, label, args);
-                } else if (subCommand.equals("skills")) {
-                    gui.skillAttributesGUI(player, false);
-                    return true;
-                } else if (subCommand.equals("resetattributes")) {
-                    return resetAttributesCommand.onCommand(sender, command, label, args);
-                } else if (subCommand.equals("level")) {
-                    return levelCommand.onCommand(sender, command, label, args);
+                switch (subCommand) {
+                    case "reload":
+                        return reloadCommand.onCommand(sender, command, label, args);
+                    case "skills":
+                        gui.skillAttributesGUI(player, false);
+                        return true;
+                    case "resetattributes":
+                        return resetAttributesCommand.onCommand(sender, command, label, args);
+                    case "level":
+                        return levelCommand.onCommand(sender, command, label, args);
+                    default:
+                        sender.sendMessage(Component.text("Usage: /endless [reload|skills|resetattributes|resetplayer]", NamedTextColor.RED));
+                        return false;
                 }
             }
         }
-        sender.sendMessage(ChatColor.RED + "Usage: /endless [reload|skills|resetattributes|resetplayer]");
+        sender.sendMessage(Component.text("Usage: /endless [reload|skills|resetattributes|resetplayer]", NamedTextColor.RED));
         return false;
     }
 }
