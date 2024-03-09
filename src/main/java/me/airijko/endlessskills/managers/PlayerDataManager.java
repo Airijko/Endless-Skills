@@ -1,5 +1,6 @@
 package me.airijko.endlessskills.managers;
 
+import me.airijko.endlessskills.skills.SkillAttributes;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -56,6 +57,17 @@ public class PlayerDataManager {
             }
         }
         return playerDataFile;
+    }
+
+    public void resetPlayerData(UUID playerUUID) {
+        File playerDataFile = getPlayerDataFile(playerUUID);
+        if (playerDataFile.exists()) {
+            playerDataFile.delete();
+        }
+        getPlayerDataFile(playerUUID);
+
+        // Reset all attributes to default
+        SkillAttributes.resetAllAttributesToDefault(Bukkit.getPlayer(playerUUID));
     }
 
     // Method to get the player's level

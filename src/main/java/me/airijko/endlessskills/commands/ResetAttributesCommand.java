@@ -1,29 +1,30 @@
 package me.airijko.endlessskills.commands;
 
 import me.airijko.endlessskills.skills.SkillAttributes;
-
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.command.ConsoleCommandSender;
 
 public class ResetAttributesCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("This command can only be used by a player.");
+        if (!(sender instanceof ConsoleCommandSender)) {
+            sender.sendMessage("This command can only be used in the console.");
             return true;
         }
 
-        Player player = (Player) sender;
+        // Iterate over all online players
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            // Reset attributes to their default values
+            SkillAttributes.resetAllAttributesToDefault(player);
+            // Send a message to the console indicating the action
+            sender.sendMessage("Attributes for " + player.getName() + " have been reset to their default values.");
+        }
 
-        // Reset attributes to their default values
-        SkillAttributes.resetAllAttributesToDefault(player);
-
-        player.sendMessage("Your attributes have been reset to their default values.");
         return true;
     }
 }

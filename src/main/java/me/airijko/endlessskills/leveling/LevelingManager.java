@@ -1,6 +1,7 @@
 package me.airijko.endlessskills.leveling;
 
 import me.airijko.endlessskills.managers.PlayerDataManager;
+import me.airijko.endlessskills.skills.SkillAttributes;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -12,10 +13,12 @@ public class LevelingManager {
 
     private final PlayerDataManager playerDataManager;
     private final LevelConfiguration levelConfiguration;
+    private final SkillAttributes skillAttributes;
 
-    public LevelingManager(PlayerDataManager playerDataManager, LevelConfiguration levelConfiguration) {
+    public LevelingManager(PlayerDataManager playerDataManager, LevelConfiguration levelConfiguration, SkillAttributes skillAttributes) {
         this.playerDataManager = playerDataManager;
         this.levelConfiguration = levelConfiguration;
+        this.skillAttributes = skillAttributes;
     }
 
     private void displayLevelUpMessage(Player player, int newLevel) {
@@ -30,7 +33,7 @@ public class LevelingManager {
         Bukkit.broadcastMessage(ChatColor.GOLD.toString() + ChatColor.BOLD + player.getName() + ChatColor.RESET + ChatColor.YELLOW + " has leveled up to " + ChatColor.BOLD + "Level " + newLevel);
     }
 
-    public boolean checkForLevelUp(Player player) {
+    public boolean playerLevelUp(Player player) {
         UUID playerUUID = player.getUniqueId();
         int currentXP = playerDataManager.getPlayerXP(playerUUID);
         int currentLevel = playerDataManager.getPlayerLevel(playerUUID);
@@ -63,6 +66,18 @@ public class LevelingManager {
         return false; // Indicate that the player has not leveled up
     }
 
+    public void changePlayerLevel(UUID playerUUID, int newLevel) {
+        // Reset the player's data
+        playerDataManager.resetPlayerData(playerUUID);
+
+        // Set the player's level
+        playerDataManager.setPlayerLevel(playerUUID, newLevel);
+
+        // Set the player's skill points based on the new level and the skillPointsPerLevel value
+        int skillPointsPerLevel = levelConfiguration.getSkillPointsPerLevel();
+        int totalSkillPoints = newLevel * skillPointsPerLevel;
+        playerDataManager.setPlayerSkillPoints(playerUUID, totalSkillPoints);
+    }
 
     private void displayXPGainedMessage(Player player, int newXP, double xpThresholdForNextLevel) {
         player.sendMessage(ChatColor.GREEN + "Current XP: " + newXP + " / " + (int) xpThresholdForNextLevel);
@@ -77,7 +92,7 @@ public class LevelingManager {
         playerDataManager.setPlayerXP(playerUUID, newXP);
 
         // Check for level-up
-        boolean hasLeveledUp = checkForLevelUp(player);
+        boolean hasLeveledUp = playerLevelUp(player);
 
         // If the player has leveled up, do not send the XP gained message
         if (!hasLeveledUp) {

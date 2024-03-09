@@ -1,7 +1,8 @@
 package me.airijko.endlessskills.commands;
 
 import me.airijko.endlessskills.gui.EndlessSkillsGUI;
-
+import me.airijko.endlessskills.leveling.LevelingManager;
+import me.airijko.endlessskills.managers.PlayerDataManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -13,11 +14,13 @@ public class EndlessCommand implements CommandExecutor {
     private final EndlessSkillsGUI gui;
     private final ReloadCommand reloadCommand;
     private final ResetAttributesCommand resetAttributesCommand;
+    private final LevelCommand levelCommand;
 
-    public EndlessCommand(EndlessSkillsGUI gui, ReloadCommand reloadCommand, ResetAttributesCommand resetAttributesCommand) {
+    public EndlessCommand(EndlessSkillsGUI gui, ReloadCommand reloadCommand, ResetAttributesCommand resetAttributesCommand, PlayerDataManager playerDataManager, LevelingManager levelingManager) {
         this.gui = gui;
         this.reloadCommand = reloadCommand;
         this.resetAttributesCommand = resetAttributesCommand;
+        this.levelCommand = new LevelCommand(playerDataManager, levelingManager);
     }
 
     @Override
@@ -27,19 +30,18 @@ public class EndlessCommand implements CommandExecutor {
             if (args.length > 0) {
                 String subCommand = args[0].toLowerCase();
                 if (subCommand.equals("reload")) {
-                    // Call the onCommand method of ReloadCommand
                     return reloadCommand.onCommand(sender, command, label, args);
                 } else if (subCommand.equals("skills")) {
                     gui.skillAttributesGUI(player, false);
                     return true;
                 } else if (subCommand.equals("resetattributes")) {
-                    // Execute the ResetAttributesCommand
                     return resetAttributesCommand.onCommand(sender, command, label, args);
+                } else if (subCommand.equals("level")) {
+                    return levelCommand.onCommand(sender, command, label, args);
                 }
             }
         }
-        sender.sendMessage(ChatColor.RED + "Usage: /endless [reload|skills|resetattributes]");
+        sender.sendMessage(ChatColor.RED + "Usage: /endless [reload|skills|resetattributes|resetplayer]");
         return false;
     }
 }
-

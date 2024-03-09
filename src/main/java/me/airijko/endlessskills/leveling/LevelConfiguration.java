@@ -1,6 +1,5 @@
 package me.airijko.endlessskills.leveling;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -46,8 +45,6 @@ public class LevelConfiguration {
     }
 
     public double calculateThreshold(int level) {
-        plugin.getLogger().log(Level.INFO, "Calculating threshold for level: " + level);
-
         // Parse the expression
         Expression e = new ExpressionBuilder(expression)
                 .variables("level", "base")
