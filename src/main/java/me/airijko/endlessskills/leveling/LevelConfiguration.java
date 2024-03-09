@@ -1,18 +1,22 @@
 package me.airijko.endlessskills.leveling;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
-import java.io.File;
 import java.nio.file.Files;
 import java.util.logging.Level;
+
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
 
 public class LevelConfiguration {
 
     private final JavaPlugin plugin;
-    private double multiplier;
+    private String expression;
     private double base;
     private int skillPointsPerLevel;
 
@@ -31,21 +35,28 @@ public class LevelConfiguration {
                 }
                 Files.copy(in, levelingFile.toPath());
             } catch (IOException e) {
-                plugin.getLogger().log(Level.SEVERE, "Failed to create leveling.yml file.", e);
-                return;
+                plugin.getLogger().log(Level.SEVERE, "Failed to load leveling.yml from resources.", e);
             }
         }
 
-        YamlConfiguration levelingFormulaConfig = YamlConfiguration.loadConfiguration(levelingFile);
-        this.multiplier = levelingFormulaConfig.getDouble("default.multiplier", 100.0);
-        this.base = levelingFormulaConfig.getDouble("default.base", 100.0);
-        this.skillPointsPerLevel = levelingFormulaConfig.getInt("skillPointsPerLevel", 5);
+        YamlConfiguration levelingConfig = YamlConfiguration.loadConfiguration(levelingFile);
+        this.expression = levelingConfig.getString("default.expression", "base * ((log(level)+1) * (sqrt(level)))^2");
+        this.base = levelingConfig.getDouble("default.base", 100.0);
+        this.skillPointsPerLevel = levelingConfig.getInt("skillPointsPerLevel", 3);
     }
 
     public double calculateThreshold(int level) {
-        // Calculate the threshold using the formula
-        double threshold = multiplier * Math.pow(level - 2, 2) + base;
-        return threshold;
+        plugin.getLogger().log(Level.INFO, "Calculating threshold for level: " + level);
+
+        // Parse the expression
+        Expression e = new ExpressionBuilder(expression)
+                .variables("level", "base")
+                .build()
+                .setVariable("level", level)
+                .setVariable("base", base);
+
+        // Evaluate the expression
+        return e.evaluate();
     }
 
     public int getSkillPointsPerLevel() {

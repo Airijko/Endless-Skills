@@ -1,3 +1,4 @@
+# config.yml
 skill_attributes:
   life_force: 1.0
   strength: 0.5
@@ -11,3 +12,6 @@ skill_attributes:
     critical_chance: 0.75
   ferocity:
     critical_damage: 1.5
+
+# Setting for enabling/disabling the damage hologram
+damage_hologram_enabled: true

@@ -34,7 +34,7 @@ public class LevelingManager {
         UUID playerUUID = player.getUniqueId();
         int currentXP = playerDataManager.getPlayerXP(playerUUID);
         int currentLevel = playerDataManager.getPlayerLevel(playerUUID);
-        double xpForNextLevel = levelConfiguration.calculateThreshold(currentLevel + 1);
+        double xpForNextLevel = levelConfiguration.calculateThreshold(currentLevel);
 
         // Check if the player has enough XP to level up
         if (currentXP >= xpForNextLevel) {
@@ -83,7 +83,7 @@ public class LevelingManager {
         if (!hasLeveledUp) {
             // Calculate the current level and the threshold for the next level
             int currentLevel = playerDataManager.getPlayerLevel(playerUUID);
-            double xpThresholdForNextLevel = levelConfiguration.calculateThreshold(currentLevel + 1);
+            double xpThresholdForNextLevel = levelConfiguration.calculateThreshold(currentLevel);
 
             // Correctly call the displayXPGainedMessage method with matching parameters
             displayXPGainedMessage(player, newXP, xpThresholdForNextLevel);

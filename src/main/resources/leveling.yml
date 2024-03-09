@@ -1,8 +1,7 @@
 # This is the leveling formula for the server. It is used to calculate the amount of experience required to level up.
 default:
-  expression: 'multiplier * (level - 2) ^ 2 + base'
-  multiplier: 2.0
-  base: 10.0
+  expression: 'base * ((log(level)+1) * (sqrt(level)))^2'
+  base: 50
 
 # Skill points gained per level. I don't recommend changing this value.
 # If you do, make sure to reset everyone to sync the skill points
