@@ -30,7 +30,7 @@ public class EndlessCommand implements CommandExecutor {
                     // Call the onCommand method of ReloadCommand
                     return reloadCommand.onCommand(sender, command, label, args);
                 } else if (subCommand.equals("skills")) {
-                    gui.openGUI(player);
+                    gui.skillAttributesGUI(player, false);
                     return true;
                 } else if (subCommand.equals("resetattributes")) {
                     // Execute the ResetAttributesCommand

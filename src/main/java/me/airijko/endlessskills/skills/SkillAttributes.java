@@ -67,11 +67,18 @@ public class SkillAttributes {
         }
     }
 
-    public void modifyFocus(Player player, int level) {
-        // Example for Focus, you might need a custom solution
+    public double modifyPrecision(Player player, int level) {
+        double precisionValue = plugin.getConfig().getDouble("skill_attributes.precision.critical_rate", 1.0) * level;
+        return precisionValue / 100;
     }
 
-    public void applyModifiers(Player player) {
+    public double modifyFerocity(Player player, int level) {
+        double ferocityValue = plugin.getConfig().getDouble("skill_attributes.ferocity.critical_damage", 2.0) * level;
+        return ferocityValue  / 100;
+    }
+
+
+    public void applyModifierToPlayer(Player player) {
         UUID playerUUID = player.getUniqueId();
 
         // Reset all attributes to default for the specific player
@@ -93,14 +100,17 @@ public class SkillAttributes {
         int hasteLevel = getAttributeLevel(playerUUID, "Haste");
         modifyHaste(player, hasteLevel);
 
-        // Apply Focus modifier
-        int focusLevel = getAttributeLevel(playerUUID, "Focus");
-        modifyFocus(player, focusLevel);
+        // Apply Precision modifier
+        int precisionLevel = getAttributeLevel(playerUUID, "Precision");
+        modifyPrecision(player, precisionLevel);
+
+        int ferocityLevel = getAttributeLevel(playerUUID, "Ferocity");
+        modifyPrecision(player, ferocityLevel);
     }
 
     public void applyModifiersToAllPlayers() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            applyModifiers(player);
+            applyModifierToPlayer(player);
         }
     }
 
@@ -136,6 +146,7 @@ public class SkillAttributes {
             Player player = Bukkit.getPlayer(playerUUID);
             if (player != null) {
                 player.sendMessage(ChatColor.GREEN + "Leveled " + ChatColor.AQUA + attributeName + ChatColor.GREEN + " to " + ChatColor.AQUA + (currentAttributeLevel + 1) + ChatColor.GREEN + "!");
+                applyModifierToPlayer(player);
             }
         } else {
             // Optionally, send a message to the player indicating they don't have enough skill points
@@ -163,6 +174,25 @@ public class SkillAttributes {
             playerDataConfig.save(playerDataFile);
         } catch (IOException e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to save player data", e);
+        }
+    }
+
+    public String getAttributeDescription(String attributeName) {
+        switch (attributeName) {
+            case "Life_Force":
+                return "Increases max health by 1.0 per level.";
+            case "Strength":
+                return "Increases attack damage by 0.5 per level.";
+            case "Tenacity":
+                return "Increases armor toughness by 0.0125 and knockback resistance by 0.003 per level.";
+            case "Haste":
+                return "Increases attack speed by 0.04 and movement speed by 0.01 per level.";
+            case "Precision":
+                return "Precision description placeholder."; // Update this with the actual description
+            case "Ferocity":
+                return "Ferocity description placeholder."; // Update this with the actual description
+            default:
+                return "Description not found.";
         }
     }
 }

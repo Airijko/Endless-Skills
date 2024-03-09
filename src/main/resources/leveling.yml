@@ -6,3 +6,67 @@ default:
 
 # Skill points gained per level
 skillPointsPerLevel: 3
+
+# Path: src/main/resources/skills.yml
+# Compare this snippet from src/main/resources/config.yml:
+# skills:
+#   life_force:
+#     name: Life Force
+#     description: Increases maximum health.
+#     max_level: 100
+#     max_value: 100.0
+#     value_per_level: 1.0
+#     cost: 2
+#     icon: BARRIER
+#     attribute: life_force
+#   strength:
+#     name: Strength
+#     description: Increases damage dealt.
+#     max_level: 100
+#     max_value: 100.0
+#     value_per_level: 0.5
+#     cost: 2
+#     icon: IRON_SWORD
+#     attribute: strength
+#   tenacity:
+#     name: Tenacity
+#     description: Increases knock back resistance and toughness.
+#     max_level: 100
+#     max_value: 100.0
+#     value_per_level: 0.003
+#     cost: 2
+#     icon: IRON_CHESTPLATE
+#     attribute: tenacity
+#   haste:
+#     name: Haste
+#     description: Increases attack speed and movement speed.
+#     max_level: 100
+#     max_value: 100.0
+#     value_per_level: 0.02
+#     cost: 2
+#     icon: GOLDEN_PICKAXE
+#     attribute: haste
+#
+# Compare this snippet from src/main/resources/plugin.yml:
+# name: EndlessSkills
+# version: '1.0'
+# main: me.airijko.endlessskills.EndlessSkills
+# api-version: '1.20'
+# commands:
+#   endless:
+#     description: Main command for EndlessSkills plugin.
+#     usage: /<command> [reload|skills|resetattributes]
+# This is the configuration for all the skills in the server. It contains all the skills and their attributes.
+skills:
+  life_force:
+    name: Life Force
+    description: Increases maximum health.
+    max_level: 100
+    max_value: 100.0
+    value_per_level: 1.0
+    cost: 2
+    icon: BARRIER
+    attribute: life_force
+  strength:
+    name: Strength
+    description: Increases

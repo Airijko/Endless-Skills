@@ -11,6 +11,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
+import java.util.Map;
 
 public class EntityEventListener implements Listener {
 
@@ -28,18 +29,21 @@ public class EntityEventListener implements Listener {
         Entity entity = event.getEntity();
         EntityDamageEvent lastDamageCause = entity.getLastDamageCause();
 
-        // Check if the last damage cause is an instance of EntityDamageByEntityEvent
         if (lastDamageCause instanceof EntityDamageByEntityEvent) {
             EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) lastDamageCause;
 
             if (damageByEntityEvent.getDamager() instanceof Player) {
                 Player player = (Player) damageByEntityEvent.getDamager();
 
+                // Get the mob's name
+                String mobName = entity.getType().name();
+
+                // Use the getXPForMob method from XPConfiguration to get the XP value for the mob
+                int xpForMob = xpConfiguration.getXPForMob(mobName);
+
                 // Use the addXP method from LevelingManager to add XP and handle level-ups
-                int xpForMob = xpConfiguration.getMobKillXP(); // Use the XP value from XPConfiguration
                 levelingManager.addXP(player, xpForMob);
             }
         }
     }
-
 }

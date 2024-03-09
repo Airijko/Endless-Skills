@@ -48,7 +48,8 @@ public class PlayerDataManager {
                 playerDataConfig.set("Attributes.Strength", 0);
                 playerDataConfig.set("Attributes.Tenacity", 0);
                 playerDataConfig.set("Attributes.Haste", 0);
-                playerDataConfig.set("Attributes.Focus", 0);
+                playerDataConfig.set("Attributes.Precision", 0);
+                playerDataConfig.set("Attributes.Ferocity", 0);
                 playerDataConfig.save(playerDataFile);
             } catch (IOException e) {
                 plugin.getLogger().log(Level.SEVERE, "Failed to save player data", e);
