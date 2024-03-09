@@ -4,7 +4,8 @@ default:
   multiplier: 2.0
   base: 10.0
 
-# Skill points gained per level
+# Skill points gained per level. I don't recommend changing this value.
+# If you do, make sure to reset everyone to sync the skill points
 skillPointsPerLevel: 3
 
 # Path: src/main/resources/skills.yml

@@ -1,7 +1,6 @@
 package me.airijko.endlessskills.listeners;
 
 import me.airijko.endlessskills.gui.EndlessSkillsGUI;
-import me.airijko.endlessskills.managers.PlayerDataManager;
 import me.airijko.endlessskills.skills.SkillAttributes;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -13,27 +12,20 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.UUID;
-import java.util.logging.Logger;
 
 public class EndlessGUIListener implements Listener {
     private final EndlessSkillsGUI endlessSkillsGUI;
     private final SkillAttributes skillAttributes;
-    private final PlayerDataManager playerDataManager;
-    private final Logger logger = Logger.getLogger(EndlessGUIListener.class.getName());
 
-    public EndlessGUIListener(EndlessSkillsGUI endlessSkillsGUI, SkillAttributes skillAttributes, PlayerDataManager playerDataManager) {
+    public EndlessGUIListener(EndlessSkillsGUI endlessSkillsGUI, SkillAttributes skillAttributes) {
         this.endlessSkillsGUI = endlessSkillsGUI;
         this.skillAttributes = skillAttributes;
-        this.playerDataManager = playerDataManager;
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         // Retrieve the Inventory object from the EndlessSkillsGUI instance
         Inventory guiInventory = endlessSkillsGUI.getInventory();
-
-        // Log the event details for debugging purposes
-        logger.info("InventoryClickEvent triggered. Clicked inventory: " + event.getClickedInventory());
 
         // Check if the inventory involved in the event is the GUI inventory
         if (event.getClickedInventory() != null && event.getClickedInventory().equals(guiInventory)) {
@@ -46,8 +38,6 @@ public class EndlessGUIListener implements Listener {
                 // Cancel the event to prevent any interaction with the custom GUI
                 event.setCancelled(true);
 
-                // Log the cancellation of the event
-                logger.info("Event cancelled. Action: " + event.getAction());
             }
 
             // Handle attribute level increase

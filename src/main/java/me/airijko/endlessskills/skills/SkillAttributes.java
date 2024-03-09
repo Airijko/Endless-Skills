@@ -55,8 +55,8 @@ public class SkillAttributes {
     }
 
     public void modifyHaste(Player player, int level) {
-        double attackSpeedValue = plugin.getConfig().getDouble("skill_attributes.haste.attack_speed", 0.04) * level;
-        double movementSpeedValue = plugin.getConfig().getDouble("skill_attributes.haste.movement_speed", 0.01) * level;
+        double attackSpeedValue = plugin.getConfig().getDouble("skill_attributes.haste.attack_speed", 0.02) * level;
+        double movementSpeedValue = plugin.getConfig().getDouble("skill_attributes.haste.movement_speed", 0.001) * level;
         AttributeInstance attackSpeed = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
         AttributeInstance movementSpeed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
         if (attackSpeed != null) {
@@ -68,12 +68,12 @@ public class SkillAttributes {
     }
 
     public double modifyPrecision(Player player, int level) {
-        double precisionValue = plugin.getConfig().getDouble("skill_attributes.precision.critical_rate", 1.0) * level;
+        double precisionValue = plugin.getConfig().getDouble("skill_attributes.precision.critical_rate", 0.75) * level;
         return precisionValue / 100;
     }
 
     public double modifyFerocity(Player player, int level) {
-        double ferocityValue = plugin.getConfig().getDouble("skill_attributes.ferocity.critical_damage", 2.0) * level;
+        double ferocityValue = plugin.getConfig().getDouble("skill_attributes.ferocity.critical_damage", 1.5) * level;
         return ferocityValue  / 100;
     }
 

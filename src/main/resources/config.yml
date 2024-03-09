@@ -8,6 +8,6 @@ skill_attributes:
     attack_speed: 0.02
     movement_speed: 0.001
   precision:
-    critical_chance: 1.0
+    critical_chance: 0.75
   ferocity:
-    critical_damage: 2.0
+    critical_damage: 1.5

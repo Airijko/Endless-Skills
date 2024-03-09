@@ -43,7 +43,7 @@ public final class EndlessSkills extends JavaPlugin {
         getServer().getPluginManager().registerEvents(playerEventListener, this);
         getServer().getPluginManager().registerEvents(new EntityEventListener(xpConfiguration, levelingManager), this);
         getServer().getPluginManager().registerEvents(new DamageListener(skillAttributes, this), this);
-        getServer().getPluginManager().registerEvents(new EndlessGUIListener(endlessSkillsGUI, skillAttributes, playerDataManager), this);
+        getServer().getPluginManager().registerEvents(new EndlessGUIListener(endlessSkillsGUI, skillAttributes), this);
 
     }
 
