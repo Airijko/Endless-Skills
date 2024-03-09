@@ -12,7 +12,6 @@ import me.airijko.endlessskills.skills.SkillAttributes;
 
 import me.airijko.endlessskills.listeners.PlayerEventListener;
 import me.airijko.endlessskills.listeners.EntityEventListener;
-import me.airijko.endlessskills.listeners.AttributeListener;
 import me.airijko.endlessskills.listeners.EndlessGUIListener;
 import me.airijko.endlessskills.listeners.DamageListener;
 
@@ -30,7 +29,6 @@ public final class EndlessSkills extends JavaPlugin {
         SkillAttributes skillAttributes = new SkillAttributes(this, playerDataManager);
         PlayerEventListener playerEventListener = new PlayerEventListener(playerDataManager);
         EndlessSkillsGUI endlessSkillsGUI = new EndlessSkillsGUI(playerDataManager, skillAttributes);
-        AttributeListener attributeListener = new AttributeListener(skillAttributes, playerDataManager, endlessSkillsGUI);
         LevelingManager levelingManager = new LevelingManager(playerDataManager, levelConfiguration);
         XPConfiguration xpConfiguration = new XPConfiguration(this);
         ReloadCommand reloadCommand = new ReloadCommand(this, xpConfiguration, levelConfiguration);
@@ -44,9 +42,8 @@ public final class EndlessSkills extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(playerEventListener, this);
         getServer().getPluginManager().registerEvents(new EntityEventListener(xpConfiguration, levelingManager), this);
-        getServer().getPluginManager().registerEvents(attributeListener, this);
         getServer().getPluginManager().registerEvents(new DamageListener(skillAttributes, this), this);
-        getServer().getPluginManager().registerEvents(new EndlessGUIListener(endlessSkillsGUI), this);
+        getServer().getPluginManager().registerEvents(new EndlessGUIListener(endlessSkillsGUI, skillAttributes, playerDataManager), this);
 
     }
 
