@@ -26,74 +26,61 @@ public class SkillAttributes {
         this.playerDataManager = playerDataManager;
     }
 
-    public void modifyLifeForce(Player player, int level) {
-        double lifeForceValue = plugin.getConfig().getDouble("skill_attributes.life_force", 1.0) * level;
-        AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-        if (maxHealth != null) {
-            maxHealth.setBaseValue(maxHealth.getBaseValue() + lifeForceValue);
+    private void modifyAttribute(Player player, int level, String configKey, Attribute attribute) {
+        double attributeValue = getAttributeValue(configKey, level);
+        AttributeInstance attributeInstance = player.getAttribute(attribute);
+        if (attributeInstance != null) {
+            attributeInstance.setBaseValue(attributeInstance.getBaseValue() + attributeValue);
         }
+    }
+
+    private double getAttributeValue(String configKey, int level) {
+        return plugin.getConfig().getDouble(configKey, 0.0) * level;
+    }
+
+    public void modifyLifeForce(Player player, int level) {
+        modifyAttribute(player, level, "skill_attributes.life_force", Attribute.GENERIC_MAX_HEALTH);
     }
 
     public void modifyStrength(Player player, int level) {
-        double strengthValue = plugin.getConfig().getDouble("skill_attributes.strength", 0.5) * level;
-        AttributeInstance attackDamage = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
-        if (attackDamage != null) {
-            attackDamage.setBaseValue(attackDamage.getBaseValue() + strengthValue);
-        }
+        modifyAttribute(player, level, "skill_attributes.strength", Attribute.GENERIC_ATTACK_DAMAGE);
     }
 
     public void modifyTenacity(Player player, int level) {
-        double toughnessValue = plugin.getConfig().getDouble("skill_attributes.tenacity.toughness", 0.0125) * level;
-        double knockbackResistanceValue = plugin.getConfig().getDouble("skill_attributes.tenacity.knock_back_resistance", 0.003) * level;
-        AttributeInstance toughness = player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS);
-        AttributeInstance knockbackResistance = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
-        if (toughness != null) {
-            toughness.setBaseValue(toughness.getBaseValue() + toughnessValue);
-        }
-        if (knockbackResistance != null) {
-            knockbackResistance.setBaseValue(knockbackResistance.getBaseValue() + knockbackResistanceValue);
-        }
+        modifyAttribute(player, level, "skill_attributes.tenacity.toughness", Attribute.GENERIC_ARMOR_TOUGHNESS);
+        modifyAttribute(player, level, "skill_attributes.tenacity.knock_back_resistance", Attribute.GENERIC_KNOCKBACK_RESISTANCE);
     }
 
     public void modifyHaste(Player player, int level) {
-        double attackSpeedValue = plugin.getConfig().getDouble("skill_attributes.haste.attack_speed", 0.02) * level;
-        double movementSpeedValue = plugin.getConfig().getDouble("skill_attributes.haste.movement_speed", 0.001) * level;
-        AttributeInstance attackSpeed = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
-        AttributeInstance movementSpeed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-        if (attackSpeed != null) {
-            attackSpeed.setBaseValue(attackSpeed.getBaseValue() + attackSpeedValue);
-        }
-        if (movementSpeed != null) {
-            movementSpeed.setBaseValue(movementSpeed.getBaseValue() + movementSpeedValue);
-        }
+        modifyAttribute(player, level, "skill_attributes.haste.attack_speed", Attribute.GENERIC_ATTACK_SPEED);
+        modifyAttribute(player, level, "skill_attributes.haste.movement_speed", Attribute.GENERIC_MOVEMENT_SPEED);
     }
 
     public double modifyPrecision(int level) {
-        double precisionValue = plugin.getConfig().getDouble("skill_attributes.precision.critical_rate", 0.75) * level;
-        return precisionValue / 100;
+        return getAttributeValue("skill_attributes.precision.critical_rate", level) / 100;
     }
 
     public double modifyFerocity(int level) {
-        double ferocityValue = plugin.getConfig().getDouble("skill_attributes.ferocity.critical_damage", 1.5) * level;
-        return ferocityValue  / 100;
+        return getAttributeValue("skill_attributes.ferocity.critical_damage", level) / 100;
     }
+
 
     public double getModifiedValue(String attributeName, int level) {
         switch (attributeName) {
             case "Life_Force":
-                return plugin.getConfig().getDouble("skill_attributes.life_force", 1.0) * level;
+                return getAttributeValue("skill_attributes.life_force", level);
             case "Strength":
-                return plugin.getConfig().getDouble("skill_attributes.strength", 0.5) * level;
+                return getAttributeValue("skill_attributes.strength", level);
             case "Tenacity":
-                return plugin.getConfig().getDouble("skill_attributes.tenacity.toughness", 0.0125) * level
-                        + plugin.getConfig().getDouble("skill_attributes.tenacity.knock_back_resistance", 0.003) * level;
+                return getAttributeValue("skill_attributes.tenacity.toughness", level)
+                        + getAttributeValue("skill_attributes.tenacity.knock_back_resistance", level);
             case "Haste":
-                return plugin.getConfig().getDouble("skill_attributes.haste.attack_speed", 0.02) * level
-                        + plugin.getConfig().getDouble("skill_attributes.haste.movement_speed", 0.001) * level;
+                return getAttributeValue("skill_attributes.haste.attack_speed", level)
+                        + getAttributeValue("skill_attributes.haste.movement_speed", level);
             case "Precision":
-                return plugin.getConfig().getDouble("skill_attributes.precision.critical_rate", 0.75) * level / 100;
+                return getAttributeValue("skill_attributes.precision.critical_rate", level) / 100;
             case "Ferocity":
-                return plugin.getConfig().getDouble("skill_attributes.ferocity.critical_damage", 1.5) * level / 100;
+                return getAttributeValue("skill_attributes.ferocity.critical_damage", level) / 100;
             default:
                 return 0.0;
         }
@@ -207,17 +194,17 @@ public class SkillAttributes {
     public String getAttributeDescription(String attributeName) {
         switch (attributeName) {
             case "Life_Force":
-                return "Increases max health by 1.0 per level.";
+                return "Increases max health by " + getAttributeValue("skill_attributes.life_force", 1) + " per level.";
             case "Strength":
-                return "Increases attack damage by 0.5 per level.";
+                return "Increases attack damage by " + getAttributeValue("skill_attributes.strength", 1) + " per level.";
             case "Tenacity":
-                return "Increases armor toughness by 0.0125 and knockback resistance by 0.003 per level.";
+                return "Increases armor toughness by " + getAttributeValue("skill_attributes.tenacity.toughness", 1) + " and knockback resistance by " + getAttributeValue("skill_attributes.tenacity.knock_back_resistance", 1) + " per level.";
             case "Haste":
-                return "Increases attack speed by 0.04 and movement speed by 0.01 per level.";
+                return "Increases attack speed by " + getAttributeValue("skill_attributes.haste.attack_speed", 1) + " and movement speed by " + getAttributeValue("skill_attributes.haste.movement_speed", 1) + " per level.";
             case "Precision":
-                return "Increase critical rate by 0.75% per level.";
+                return "Increase critical rate by " + getAttributeValue("skill_attributes.precision.critical_rate", 1) + "% per level.";
             case "Ferocity":
-                return "Increase critical damage by 1.5% per level.";
+                return "Increase critical damage by " + getAttributeValue("skill_attributes.ferocity.critical_damage", 1) + "% per level.";
             default:
                 return "Description not found.";
         }
