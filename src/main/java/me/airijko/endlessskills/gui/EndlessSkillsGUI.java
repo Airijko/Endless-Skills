@@ -8,13 +8,16 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class EndlessSkillsGUI {
@@ -35,30 +38,25 @@ public class EndlessSkillsGUI {
         // Create a new inventory with 9 slots (1 row)
         gui = Bukkit.createInventory(null, InventoryType.CHEST, Component.text("Endless Skills"));
 
-        // Retrieve the attribute levels and add wool items for different skill points
-        int lifeForceLevel = skillAttributes.getAttributeLevel(player.getUniqueId(), "Life_Force");
-        String lifeForceDescription = skillAttributes.getAttributeDescription("Life_Force");
-        gui.setItem(10, createWoolItem(Material.RED_WOOL, NamedTextColor.RED, "Life Force", String.valueOf(lifeForceLevel), lifeForceDescription));
+        // Create a list of attribute names
+        List<String> attributes = Arrays.asList("Life_Force", "Strength", "Tenacity", "Haste", "Precision", "Ferocity");
 
-        int strengthLevel = skillAttributes.getAttributeLevel(player.getUniqueId(), "Strength");
-        String strengthDescription = skillAttributes.getAttributeDescription("Strength");
-        gui.setItem(11, createWoolItem(Material.ORANGE_WOOL, NamedTextColor.GOLD, "Strength", String.valueOf(strengthLevel), strengthDescription));
+        // Create a list of wool colors
+        List<Material> woolColors = Arrays.asList(Material.RED_WOOL, Material.ORANGE_WOOL, Material.YELLOW_WOOL, Material.LIME_WOOL, Material.LIGHT_BLUE_WOOL, Material.BLUE_WOOL);
 
-        int tenacityLevel = skillAttributes.getAttributeLevel(player.getUniqueId(), "Tenacity");
-        String tenacityDescription = skillAttributes.getAttributeDescription("Tenacity");
-        gui.setItem(12, createWoolItem(Material.YELLOW_WOOL, NamedTextColor.YELLOW, "Tenacity", String.valueOf(tenacityLevel), tenacityDescription));
+        // Create a list of text colors
+        List<NamedTextColor> textColors = Arrays.asList(NamedTextColor.RED, NamedTextColor.GOLD, NamedTextColor.YELLOW, NamedTextColor.GREEN, NamedTextColor.AQUA, NamedTextColor.AQUA);
 
-        int hasteLevel = skillAttributes.getAttributeLevel(player.getUniqueId(), "Haste");
-        String hasteDescription = skillAttributes.getAttributeDescription("Haste");
-        gui.setItem(14, createWoolItem(Material.LIME_WOOL, NamedTextColor.GREEN, "Haste", String.valueOf(hasteLevel), hasteDescription));
-
-        int precisionLevel = skillAttributes.getAttributeLevel(player.getUniqueId(), "Precision");
-        String precisionDescription = skillAttributes.getAttributeDescription("Precision");
-        gui.setItem(15, createWoolItem(Material.LIGHT_BLUE_WOOL, NamedTextColor.AQUA, "Precision", String.valueOf(precisionLevel), precisionDescription));
-
-        int ferocityLevel = skillAttributes.getAttributeLevel(player.getUniqueId(), "Ferocity");
-        String ferocityDescription = skillAttributes.getAttributeDescription("Ferocity");
-        gui.setItem(16, createWoolItem(Material.BLUE_WOOL, NamedTextColor.AQUA, "Ferocity", String.valueOf(ferocityLevel), ferocityDescription));
+        // Iterate over the attributes list
+        int slotIndex = 10;
+        for (int i = 0; i < attributes.size(); i++) {
+            if (slotIndex == 13) slotIndex++;  // Skip slot 13 for the Nether Star
+            String attribute = attributes.get(i);
+            int level = skillAttributes.getAttributeLevel(playerUUID, attribute);
+            String description = skillAttributes.getAttributeDescription(attribute);
+            gui.setItem(slotIndex, createWoolItem(woolColors.get(i), textColors.get(i), attribute, String.valueOf(level), description, attribute));
+            slotIndex++;
+        }
 
         ItemStack netherStar = createNetherStarItem(playerUUID, playerDataManager, totalSkillPoints);
 
@@ -79,22 +77,35 @@ public class EndlessSkillsGUI {
 
             netherStarMeta.displayName(Component.text((playerName + " Stats").toUpperCase(), NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true));
 
-            netherStarMeta.lore(Arrays.asList(
-                    Component.text("Level " + playerDataManager.getPlayerLevel(playerUUID), NamedTextColor.AQUA),
-                    Component.text( "Available Skill Points: " + totalSkillPoints, NamedTextColor.GRAY)
-            ));
+            List<Component> lore = new ArrayList<>();
+            lore.add(Component.text("Level " + playerDataManager.getPlayerLevel(playerUUID), NamedTextColor.AQUA));
+
+            String[] attributes = {"Life_Force", "Strength", "Tenacity", "Haste", "Precision", "Ferocity"};
+            for (String attribute : attributes) {
+                int level = skillAttributes.getAttributeLevel(playerUUID, attribute);
+                lore.add(Component.text(attribute + ": " + level, NamedTextColor.GRAY));
+            }
+
+            lore.add(Component.text("Available Skill Points: " + totalSkillPoints, NamedTextColor.YELLOW));
+            netherStarMeta.lore(lore);
 
             netherStar.setItemMeta(netherStarMeta);
         }
         return netherStar;
     }
 
-    private ItemStack createWoolItem(Material woolType, NamedTextColor color, String displayName, String attributeLevel, String description) {
+    private ItemStack createWoolItem(Material woolType, NamedTextColor color, String displayName, String attributeLevel, String description, String attributeName) {
         ItemStack woolItem = new ItemStack(woolType);
         ItemMeta meta = woolItem.getItemMeta();
         if (meta != null) {
             meta.displayName(Component.text(displayName, color));
-            meta.lore(Arrays.asList(Component.text("Level: " + attributeLevel, NamedTextColor.GRAY), Component.text(description, NamedTextColor.GRAY)));
+            int level = Integer.parseInt(attributeLevel);
+            String additionalLine = "Modified Value: " + skillAttributes.getModifiedValue(attributeName, level);
+            meta.lore(Arrays.asList(
+                    Component.text("Level: " + attributeLevel, NamedTextColor.GRAY),
+                    Component.text(description, NamedTextColor.GRAY),
+                    Component.text(additionalLine, NamedTextColor.GRAY)
+            ));
             woolItem.setItemMeta(meta);
         }
         return woolItem;

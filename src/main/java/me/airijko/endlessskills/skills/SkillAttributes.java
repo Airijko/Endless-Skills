@@ -78,6 +78,27 @@ public class SkillAttributes {
         return ferocityValue  / 100;
     }
 
+    public double getModifiedValue(String attributeName, int level) {
+        switch (attributeName) {
+            case "Life_Force":
+                return plugin.getConfig().getDouble("skill_attributes.life_force", 1.0) * level;
+            case "Strength":
+                return plugin.getConfig().getDouble("skill_attributes.strength", 0.5) * level;
+            case "Tenacity":
+                return plugin.getConfig().getDouble("skill_attributes.tenacity.toughness", 0.0125) * level
+                        + plugin.getConfig().getDouble("skill_attributes.tenacity.knock_back_resistance", 0.003) * level;
+            case "Haste":
+                return plugin.getConfig().getDouble("skill_attributes.haste.attack_speed", 0.02) * level
+                        + plugin.getConfig().getDouble("skill_attributes.haste.movement_speed", 0.001) * level;
+            case "Precision":
+                return plugin.getConfig().getDouble("skill_attributes.precision.critical_rate", 0.75) * level / 100;
+            case "Ferocity":
+                return plugin.getConfig().getDouble("skill_attributes.ferocity.critical_damage", 1.5) * level / 100;
+            default:
+                return 0.0;
+        }
+    }
+
 
     public void applyModifierToPlayer(Player player) {
         UUID playerUUID = player.getUniqueId();

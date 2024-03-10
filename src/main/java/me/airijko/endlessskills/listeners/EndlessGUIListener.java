@@ -1,7 +1,7 @@
 package me.airijko.endlessskills.listeners;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import me.airijko.endlessskills.gui.EndlessSkillsGUI;
 import me.airijko.endlessskills.skills.SkillAttributes;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -50,8 +50,8 @@ public class EndlessGUIListener implements Listener {
 
                 if (itemMeta != null) {
                     String displayName = GsonComponentSerializer.gson().serialize(Objects.requireNonNull(itemMeta.displayName()));
-                    JsonParser parser = new JsonParser();
-                    JsonObject jsonObject = parser.parse(displayName).getAsJsonObject();
+                    Gson gson = new Gson();
+                    JsonObject jsonObject = gson.fromJson(displayName, JsonObject.class);
                     String text = jsonObject.get("text").getAsString();
 
                     Player player = (Player) event.getWhoClicked();
