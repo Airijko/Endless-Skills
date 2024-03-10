@@ -40,7 +40,7 @@ public class EntityEventListener implements Listener {
                 int xpForMob = xpConfiguration.getXPForMob(mobName);
 
                 // Use the addXP method from LevelingManager to add XP and handle level-ups
-                levelingManager.addXP(player, xpForMob);
+                levelingManager.handleXP(player, xpForMob);
             }
         }
     }

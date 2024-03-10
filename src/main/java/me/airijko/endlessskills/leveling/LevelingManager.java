@@ -4,20 +4,31 @@ import me.airijko.endlessskills.managers.PlayerDataManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class LevelingManager {
-
+    private final JavaPlugin plugin;
     private final PlayerDataManager playerDataManager;
     private final LevelConfiguration levelConfiguration;
+    private final Map<UUID, BossBar> playerBossBars = new HashMap<>();
+    private final Map<UUID, BukkitTask> removalTasks = new HashMap<>();
 
-    public LevelingManager(PlayerDataManager playerDataManager, LevelConfiguration levelConfiguration) {
+    public LevelingManager(JavaPlugin plugin, PlayerDataManager playerDataManager, LevelConfiguration levelConfiguration) {
+        this.plugin = plugin;
         this.playerDataManager = playerDataManager;
         this.levelConfiguration = levelConfiguration;
     }
@@ -92,13 +103,59 @@ public class LevelingManager {
     }
 
     private void displayXPGainedMessage(Player player, int newXP, double xpThresholdForNextLevel) {
-        player.sendMessage(Component.text("Current XP: " + newXP + " / " + (int) xpThresholdForNextLevel, NamedTextColor.GREEN));
+        UUID playerUUID = player.getUniqueId();
+        Component bossBarTitleComponent = Component.text("+" + newXP + " / " + (int) xpThresholdForNextLevel + " XP", NamedTextColor.GREEN);
+        String bossBarTitle = LegacyComponentSerializer.legacySection().serialize(bossBarTitleComponent);
+
+        // Check if a boss bar already exists for the player
+        BossBar bossBar = playerBossBars.get(playerUUID);
+        BukkitTask removalTask = removalTasks.get(playerUUID);
+
+        if (bossBar == null) {
+            // Create a new boss bar if it doesn't exist
+            bossBar = Bukkit.createBossBar(
+                    bossBarTitle,
+                    BarColor.GREEN, // Color
+                    BarStyle.SOLID // Style
+            );
+            playerBossBars.put(playerUUID, bossBar);
+        } else {
+            // Update the title of the existing boss bar
+            bossBar.setTitle(bossBarTitle);
+        }
+
+        // Calculate the progress
+        double progress = newXP / xpThresholdForNextLevel;
+        bossBar.setProgress(progress);
+
+        // Add the player to the boss bar if not already added
+        if (!bossBar.getPlayers().contains(player)) {
+            bossBar.addPlayer(player);
+        }
+
+        // Cancel the existing removal task if it exists
+        if (removalTask != null) {
+            removalTask.cancel();
+        }
+
+        // Schedule a new removal task
+        BossBar finalBossBar = bossBar;
+        removalTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (finalBossBar.getPlayers().contains(player)) {
+                finalBossBar.removePlayer(player);
+            }
+            playerBossBars.remove(playerUUID); // Remove the boss bar from the map
+            removalTasks.remove(playerUUID); // Remove the removal task from the map
+        }, 60L); // 60 ticks = 3 seconds
+
+        // Store the new removal task
+        removalTasks.put(playerUUID, removalTask);
     }
 
-    public void addXP(Player player, int xpToAdd) {
+    public void handleXP(Player player, int XPGain) {
         UUID playerUUID = player.getUniqueId();
         int currentXP = playerDataManager.getPlayerXP(playerUUID);
-        int newXP = currentXP + xpToAdd;
+        int newXP = currentXP + XPGain;
 
         // Update the player's XP
         playerDataManager.setPlayerXP(playerUUID, newXP);
@@ -106,13 +163,13 @@ public class LevelingManager {
         // Check for level-up
         boolean hasLeveledUp = playerLevelUp(player);
 
-        // If the player has leveled up, do not send the XP gained message
+        // If the player has not leveled up, display the XP gained message
         if (!hasLeveledUp) {
             // Calculate the current level and the threshold for the next level
             int currentLevel = playerDataManager.getPlayerLevel(playerUUID);
             double xpThresholdForNextLevel = levelConfiguration.calculateThreshold(currentLevel);
 
-            // Correctly call the displayXPGainedMessage method with matching parameters
+            // Display the XP gained message
             displayXPGainedMessage(player, newXP, xpThresholdForNextLevel);
         }
     }
