@@ -144,32 +144,46 @@ public class SkillAttributes {
 
         // Check if the player has enough skill points to level up the attribute
         if (currentSkillPoints > 0) {
-            // Subtract one skill point
-            playerDataManager.setPlayerSkillPoints(playerUUID, currentSkillPoints - 1);
+            // Subtract one skill point and increase the attribute level
+            updatePlayerSkillPoints(playerUUID, currentSkillPoints - 1);
+            increaseAttributeLevel(playerUUID, attributeName);
 
-            // Increase the attribute level by 1
-            int currentAttributeLevel = getAttributeLevel(playerUUID, attributeName);
-            setAttributeLevel(playerUUID, attributeName, currentAttributeLevel + 1);
-
-            // Optionally, send a message to the player indicating the attribute level has increased
+            // Send a message to the player indicating the attribute level has increased
             Player player = Bukkit.getPlayer(playerUUID);
             if (player != null) {
-                player.sendMessage(Component.text("Leveled ", NamedTextColor.GREEN)
-                        .append(Component.text(attributeName, NamedTextColor.AQUA))
-                        .append(Component.text(" to ", NamedTextColor.GREEN))
-                        .append(Component.text(String.valueOf(currentAttributeLevel + 1), NamedTextColor.AQUA))
-                        .append(Component.text("!", NamedTextColor.GREEN)));
+                sendLevelUpMessage(player, attributeName, getAttributeLevel(playerUUID, attributeName));
                 applyModifierToPlayer(player);
             }
         } else {
-            // Optionally, send a message to the player indicating they don't have enough skill points
+            // Send a message to the player indicating they don't have enough skill points
             Player player = Bukkit.getPlayer(playerUUID);
             if (player != null) {
-                player.sendMessage(Component.text("Not enough skill points to level up ", NamedTextColor.RED)
-                        .append(Component.text(attributeName, NamedTextColor.AQUA))
-                        .append(Component.text(".", NamedTextColor.RED)));
+                sendInsufficientSkillPointsMessage(player, attributeName);
             }
         }
+    }
+
+    private void updatePlayerSkillPoints(UUID playerUUID, int newSkillPoints) {
+        playerDataManager.setPlayerSkillPoints(playerUUID, newSkillPoints);
+    }
+
+    private void increaseAttributeLevel(UUID playerUUID, String attributeName) {
+        int currentAttributeLevel = getAttributeLevel(playerUUID, attributeName);
+        setAttributeLevel(playerUUID, attributeName, currentAttributeLevel + 1);
+    }
+
+    private void sendLevelUpMessage(Player player, String attributeName, int newLevel) {
+        player.sendMessage(Component.text("Leveled ", NamedTextColor.GREEN)
+                .append(Component.text(attributeName, NamedTextColor.AQUA))
+                .append(Component.text(" to ", NamedTextColor.GREEN))
+                .append(Component.text(String.valueOf(newLevel), NamedTextColor.AQUA))
+                .append(Component.text("!", NamedTextColor.GREEN)));
+    }
+
+    private void sendInsufficientSkillPointsMessage(Player player, String attributeName) {
+        player.sendMessage(Component.text("Not enough skill points to level up ", NamedTextColor.RED)
+                .append(Component.text(attributeName, NamedTextColor.AQUA))
+                .append(Component.text(".", NamedTextColor.RED)));
     }
 
     // Method to get the level of a specific attribute
