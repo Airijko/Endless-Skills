@@ -17,6 +17,8 @@ import me.airijko.endlessskills.listeners.DamageListener;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Objects;
+
 public final class EndlessSkills extends JavaPlugin {
 
     @Override
@@ -29,16 +31,16 @@ public final class EndlessSkills extends JavaPlugin {
         SkillAttributes skillAttributes = new SkillAttributes(this, playerDataManager);
         PlayerEventListener playerEventListener = new PlayerEventListener(playerDataManager);
         EndlessSkillsGUI endlessSkillsGUI = new EndlessSkillsGUI(playerDataManager, skillAttributes);
-        LevelingManager levelingManager = new LevelingManager(playerDataManager, levelConfiguration, skillAttributes);
+        LevelingManager levelingManager = new LevelingManager(playerDataManager, levelConfiguration);
         XPConfiguration xpConfiguration = new XPConfiguration(this);
-        ReloadCommand reloadCommand = new ReloadCommand(this, xpConfiguration, levelConfiguration);
+        ReloadCommand reloadCommand = new ReloadCommand(xpConfiguration, levelConfiguration);
         ResetAttributesCommand resetAttributesCommand = new ResetAttributesCommand();
-        EndlessCommand command = new EndlessCommand(endlessSkillsGUI, reloadCommand, resetAttributesCommand, playerDataManager, levelingManager);
+        EndlessCommand endlessCommand = new EndlessCommand(this, endlessSkillsGUI, reloadCommand, resetAttributesCommand, playerDataManager, levelingManager);
 
         levelConfiguration.loadLevelingConfiguration();
         playerDataManager.loadPlayerDataFolder();
         skillAttributes.applyModifiersToAllPlayers();
-        getCommand("endless").setExecutor(command);
+        endlessCommand.registerCommands();
 
         getServer().getPluginManager().registerEvents(playerEventListener, this);
         getServer().getPluginManager().registerEvents(new EntityEventListener(xpConfiguration, levelingManager), this);

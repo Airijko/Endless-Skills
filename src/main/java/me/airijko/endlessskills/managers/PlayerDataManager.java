@@ -30,12 +30,18 @@ public class PlayerDataManager {
     public File getPlayerDataFile(UUID playerUUID) {
         File playerDataFolder = new File(plugin.getDataFolder(), "playerdata");
         if (!playerDataFolder.exists()) {
-            playerDataFolder.mkdir();
+            boolean result = playerDataFolder.mkdir();
+            if (!result) {
+                plugin.getLogger().log(Level.SEVERE, "Failed to create the playerdata folder.");
+            }
         }
         File playerDataFile = new File(playerDataFolder, playerUUID.toString() + ".yml");
         if (!playerDataFile.exists()) {
             try {
-                playerDataFile.createNewFile();
+                boolean result = playerDataFile.createNewFile();
+                if (!result) {
+                    plugin.getLogger().log(Level.SEVERE, "Failed to create player data file.");
+                }
                 YamlConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
                 playerDataConfig.set("UUID", playerUUID.toString());
                 Player player = Bukkit.getPlayer(playerUUID);
@@ -62,7 +68,10 @@ public class PlayerDataManager {
     public void resetPlayerData(UUID playerUUID) {
         File playerDataFile = getPlayerDataFile(playerUUID);
         if (playerDataFile.exists()) {
-            playerDataFile.delete();
+            boolean result = playerDataFile.delete();
+            if (!result) {
+                plugin.getLogger().log(Level.SEVERE, "Failed to delete player data file.");
+            }
         }
         getPlayerDataFile(playerUUID);
 

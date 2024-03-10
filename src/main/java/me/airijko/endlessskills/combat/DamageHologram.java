@@ -11,11 +11,10 @@ import java.util.Random;
 public class DamageHologram {
     private final ArmorStand armorStand;
     private static final Random random = new Random();
-    private final boolean isEnabled;
 
     public DamageHologram(JavaPlugin plugin, Location location, String message, boolean isCritical) {
 
-        this.isEnabled = plugin.getConfig().getBoolean("damage_hologram_enabled", true);
+        boolean isEnabled = plugin.getConfig().getBoolean("damage_hologram_enabled", true);
 
         if (!isEnabled) {
             this.armorStand = null;

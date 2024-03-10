@@ -11,8 +11,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import java.util.Map;
-
 public class EntityEventListener implements Listener {
 
     private final XPConfiguration xpConfiguration;

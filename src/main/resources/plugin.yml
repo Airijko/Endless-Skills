@@ -6,3 +6,12 @@ commands:
   endless:
     description: Main command for EndlessSkills plugin.
     usage: /<command> [reload|skills|resetattributes]
+  reload:
+    description: Reloads the plugin.
+    usage: /<command>
+  resetattributes:
+    description: Resets the attributes.
+    usage: /<command>
+  level:
+    description: Manages levels.
+    usage: /<command>

@@ -1,36 +1,48 @@
 package me.airijko.endlessskills.leveling;
 
 import me.airijko.endlessskills.managers.PlayerDataManager;
-import me.airijko.endlessskills.skills.SkillAttributes;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.title.Title;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 
 public class LevelingManager {
 
     private final PlayerDataManager playerDataManager;
     private final LevelConfiguration levelConfiguration;
-    private final SkillAttributes skillAttributes;
 
-    public LevelingManager(PlayerDataManager playerDataManager, LevelConfiguration levelConfiguration, SkillAttributes skillAttributes) {
+    public LevelingManager(PlayerDataManager playerDataManager, LevelConfiguration levelConfiguration) {
         this.playerDataManager = playerDataManager;
         this.levelConfiguration = levelConfiguration;
-        this.skillAttributes = skillAttributes;
     }
 
     private void displayLevelUpMessage(Player player, int newLevel) {
-        int nextLevel = newLevel + 1;
-        double nextLevelThreshold = levelConfiguration.calculateThreshold(nextLevel);
-
-        // Retrieve the skill points to add from the configuration
         int skillPointsToAdd = levelConfiguration.getSkillPointsPerLevel();
+        int currentSkillPoints = playerDataManager.getPlayerSkillPoints(player.getUniqueId());
 
-        // Display the level-up message including the skill points gained
-        player.sendMessage(ChatColor.GREEN + "Congratulations! You have leveled up to " + ChatColor.BOLD + "Level " + newLevel + ChatColor.RESET + ". You need " + (int) nextLevelThreshold + " XP towards your next level. You have gained " + ChatColor.BOLD + skillPointsToAdd + ChatColor.RESET + " skill points!");
-        Bukkit.broadcastMessage(ChatColor.GOLD.toString() + ChatColor.BOLD + player.getName() + ChatColor.RESET + ChatColor.YELLOW + " has leveled up to " + ChatColor.BOLD + "Level " + newLevel);
+        // Create a title
+        Title title = Title.title(
+                Component.text("Leveled Up!", NamedTextColor.GREEN, TextDecoration.BOLD), // Title
+                Component.text("+" + skillPointsToAdd + " SP!", NamedTextColor.AQUA), // Subtitle
+                Title.Times.of(Duration.ofSeconds(0), Duration.ofSeconds(3), Duration.ofSeconds(1)) // Times
+        );
+
+        // Display the title
+        player.showTitle(title);
+
+        // Send the skill points gained message
+        player.sendMessage(Component.text("You have " + currentSkillPoints + " skill points available!", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        // Broadcast the level up announcement
+        Bukkit.broadcast(Component.text(player.getName(), NamedTextColor.GOLD, TextDecoration.BOLD)
+                .append(Component.text(" has leveled up to ", NamedTextColor.YELLOW))
+                .append(Component.text("Level " + newLevel, NamedTextColor.GOLD, TextDecoration.BOLD)));
     }
 
     public boolean playerLevelUp(Player player) {
@@ -80,7 +92,7 @@ public class LevelingManager {
     }
 
     private void displayXPGainedMessage(Player player, int newXP, double xpThresholdForNextLevel) {
-        player.sendMessage(ChatColor.GREEN + "Current XP: " + newXP + " / " + (int) xpThresholdForNextLevel);
+        player.sendMessage(Component.text("Current XP: " + newXP + " / " + (int) xpThresholdForNextLevel, NamedTextColor.GREEN));
     }
 
     public void addXP(Player player, int xpToAdd) {

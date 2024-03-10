@@ -2,13 +2,14 @@ package me.airijko.endlessskills.skills;
 
 import me.airijko.endlessskills.managers.PlayerDataManager;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.ChatColor;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,12 +68,12 @@ public class SkillAttributes {
         }
     }
 
-    public double modifyPrecision(Player player, int level) {
+    public double modifyPrecision(int level) {
         double precisionValue = plugin.getConfig().getDouble("skill_attributes.precision.critical_rate", 0.75) * level;
         return precisionValue / 100;
     }
 
-    public double modifyFerocity(Player player, int level) {
+    public double modifyFerocity(int level) {
         double ferocityValue = plugin.getConfig().getDouble("skill_attributes.ferocity.critical_damage", 1.5) * level;
         return ferocityValue  / 100;
     }
@@ -102,10 +103,10 @@ public class SkillAttributes {
 
         // Apply Precision modifier
         int precisionLevel = getAttributeLevel(playerUUID, "Precision");
-        modifyPrecision(player, precisionLevel);
+        modifyPrecision(precisionLevel);
 
         int ferocityLevel = getAttributeLevel(playerUUID, "Ferocity");
-        modifyPrecision(player, ferocityLevel);
+        modifyPrecision(ferocityLevel);
     }
 
     public void applyModifiersToAllPlayers() {
@@ -145,18 +146,23 @@ public class SkillAttributes {
             // Optionally, send a message to the player indicating the attribute level has increased
             Player player = Bukkit.getPlayer(playerUUID);
             if (player != null) {
-                player.sendMessage(ChatColor.GREEN + "Leveled " + ChatColor.AQUA + attributeName + ChatColor.GREEN + " to " + ChatColor.AQUA + (currentAttributeLevel + 1) + ChatColor.GREEN + "!");
+                player.sendMessage(Component.text("Leveled ", NamedTextColor.GREEN)
+                        .append(Component.text(attributeName, NamedTextColor.AQUA))
+                        .append(Component.text(" to ", NamedTextColor.GREEN))
+                        .append(Component.text(String.valueOf(currentAttributeLevel + 1), NamedTextColor.AQUA))
+                        .append(Component.text("!", NamedTextColor.GREEN)));
                 applyModifierToPlayer(player);
             }
         } else {
             // Optionally, send a message to the player indicating they don't have enough skill points
             Player player = Bukkit.getPlayer(playerUUID);
             if (player != null) {
-                player.sendMessage(ChatColor.RED + "Not enough skill points to level up " + ChatColor.AQUA + attributeName + ChatColor.RED + ".");
+                player.sendMessage(Component.text("Not enough skill points to level up ", NamedTextColor.RED)
+                        .append(Component.text(attributeName, NamedTextColor.AQUA))
+                        .append(Component.text(".", NamedTextColor.RED)));
             }
         }
     }
-
 
     // Method to get the level of a specific attribute
     public int getAttributeLevel(UUID playerUUID, String attributeName) {
@@ -188,9 +194,9 @@ public class SkillAttributes {
             case "Haste":
                 return "Increases attack speed by 0.04 and movement speed by 0.01 per level.";
             case "Precision":
-                return "Precision description placeholder."; // Update this with the actual description
+                return "Increase critical rate by 0.75% per level.";
             case "Ferocity":
-                return "Ferocity description placeholder."; // Update this with the actual description
+                return "Increase critical damage by 1.5% per level.";
             default:
                 return "Description not found.";
         }

@@ -2,7 +2,7 @@ package me.airijko.endlessskills.listeners;
 
 import me.airijko.endlessskills.gui.EndlessSkillsGUI;
 import me.airijko.endlessskills.skills.SkillAttributes;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class EndlessGUIListener implements Listener {
@@ -45,7 +46,7 @@ public class EndlessGUIListener implements Listener {
                 ItemMeta itemMeta = event.getCurrentItem().getItemMeta();
 
                 if (itemMeta != null) {
-                    String displayName = ChatColor.stripColor(itemMeta.getDisplayName());
+                    String displayName = GsonComponentSerializer.gson().serialize(Objects.requireNonNull(itemMeta.displayName()));
                     Player player = (Player) event.getWhoClicked();
                     UUID playerUUID = player.getUniqueId();
 
@@ -70,7 +71,7 @@ public class EndlessGUIListener implements Listener {
                             break;
                     }
 
-                    endlessSkillsGUI.skillAttributesGUI(player, true);
+                    endlessSkillsGUI.skillAttributesGUI(player);
                 }
             }
         }

@@ -44,8 +44,8 @@ public class DamageListener implements Listener {
             int precisionLevel = skillAttributes.getAttributeLevel(player.getUniqueId(), "Precision");
             int ferocityLevel = skillAttributes.getAttributeLevel(player.getUniqueId(), "Ferocity");
 
-            double criticalHitChance = skillAttributes.modifyPrecision(player, precisionLevel);
-            double ferocityMultiplier = skillAttributes.modifyFerocity(player, ferocityLevel);
+            double criticalHitChance = skillAttributes.modifyPrecision(precisionLevel);
+            double ferocityMultiplier = skillAttributes.modifyFerocity(ferocityLevel);
 
             boolean isCritical = Math.random() < criticalHitChance;
             double damageValue = event.getDamage();
