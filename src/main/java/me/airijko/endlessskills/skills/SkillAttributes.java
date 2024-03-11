@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SkillAttributes {
 
@@ -26,74 +28,63 @@ public class SkillAttributes {
         this.playerDataManager = playerDataManager;
     }
 
-    public void modifyLifeForce(Player player, int level) {
-        double lifeForceValue = plugin.getConfig().getDouble("skill_attributes.life_force", 1.0) * level;
-        AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-        if (maxHealth != null) {
-            maxHealth.setBaseValue(maxHealth.getBaseValue() + lifeForceValue);
+    private void modifyAttribute(Player player, int level, String configKey, Attribute attribute) {
+        double attributeValue = getAttributeValue(configKey, level);
+        AttributeInstance attributeInstance = player.getAttribute(attribute);
+        if (attributeInstance != null) {
+            attributeInstance.setBaseValue(attributeInstance.getBaseValue() + attributeValue);
+        } else {
+            plugin.getLogger().log(Level.INFO, "Attribute " + attribute + " is not accessible for player " + player.getName());
         }
+    }
+
+    private double getAttributeValue(String configKey, int level) {
+        return plugin.getConfig().getDouble(configKey, 0.0) * level;
+    }
+
+    public void modifyLifeForce(Player player, int level) {
+        modifyAttribute(player, level, "skill_attributes.life_force", Attribute.GENERIC_MAX_HEALTH);
     }
 
     public void modifyStrength(Player player, int level) {
-        double strengthValue = plugin.getConfig().getDouble("skill_attributes.strength", 0.5) * level;
-        AttributeInstance attackDamage = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
-        if (attackDamage != null) {
-            attackDamage.setBaseValue(attackDamage.getBaseValue() + strengthValue);
-        }
+        modifyAttribute(player, level, "skill_attributes.strength", Attribute.GENERIC_ATTACK_DAMAGE);
     }
 
     public void modifyTenacity(Player player, int level) {
-        double toughnessValue = plugin.getConfig().getDouble("skill_attributes.tenacity.toughness", 0.0125) * level;
-        double knockbackResistanceValue = plugin.getConfig().getDouble("skill_attributes.tenacity.knock_back_resistance", 0.003) * level;
-        AttributeInstance toughness = player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS);
-        AttributeInstance knockbackResistance = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
-        if (toughness != null) {
-            toughness.setBaseValue(toughness.getBaseValue() + toughnessValue);
-        }
-        if (knockbackResistance != null) {
-            knockbackResistance.setBaseValue(knockbackResistance.getBaseValue() + knockbackResistanceValue);
-        }
+        modifyAttribute(player, level, "skill_attributes.tenacity.toughness", Attribute.GENERIC_ARMOR_TOUGHNESS);
+        modifyAttribute(player, level, "skill_attributes.tenacity.knock_back_resistance", Attribute.GENERIC_KNOCKBACK_RESISTANCE);
     }
 
     public void modifyHaste(Player player, int level) {
-        double attackSpeedValue = plugin.getConfig().getDouble("skill_attributes.haste.attack_speed", 0.02) * level;
-        double movementSpeedValue = plugin.getConfig().getDouble("skill_attributes.haste.movement_speed", 0.001) * level;
-        AttributeInstance attackSpeed = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
-        AttributeInstance movementSpeed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-        if (attackSpeed != null) {
-            attackSpeed.setBaseValue(attackSpeed.getBaseValue() + attackSpeedValue);
-        }
-        if (movementSpeed != null) {
-            movementSpeed.setBaseValue(movementSpeed.getBaseValue() + movementSpeedValue);
-        }
+        modifyAttribute(player, level, "skill_attributes.haste.attack_speed", Attribute.GENERIC_ATTACK_SPEED);
+        modifyAttribute(player, level, "skill_attributes.haste.movement_speed", Attribute.GENERIC_MOVEMENT_SPEED);
     }
 
     public double modifyPrecision(int level) {
-        double precisionValue = plugin.getConfig().getDouble("skill_attributes.precision.critical_rate", 0.75) * level;
-        return precisionValue / 100;
+        return getAttributeValue("skill_attributes.precision.critical_chance", level) / 100;
     }
 
     public double modifyFerocity(int level) {
-        double ferocityValue = plugin.getConfig().getDouble("skill_attributes.ferocity.critical_damage", 1.5) * level;
-        return ferocityValue  / 100;
+        return getAttributeValue("skill_attributes.ferocity.critical_damage", level) / 100;
     }
+
 
     public double getModifiedValue(String attributeName, int level) {
         switch (attributeName) {
             case "Life_Force":
-                return plugin.getConfig().getDouble("skill_attributes.life_force", 1.0) * level;
+                return getAttributeValue("skill_attributes.life_force", level);
             case "Strength":
-                return plugin.getConfig().getDouble("skill_attributes.strength", 0.5) * level;
+                return getAttributeValue("skill_attributes.strength", level);
             case "Tenacity":
-                return plugin.getConfig().getDouble("skill_attributes.tenacity.toughness", 0.0125) * level
-                        + plugin.getConfig().getDouble("skill_attributes.tenacity.knock_back_resistance", 0.003) * level;
+                return getAttributeValue("skill_attributes.tenacity.toughness", level)
+                        + getAttributeValue("skill_attributes.tenacity.knock_back_resistance", level);
             case "Haste":
-                return plugin.getConfig().getDouble("skill_attributes.haste.attack_speed", 0.02) * level
-                        + plugin.getConfig().getDouble("skill_attributes.haste.movement_speed", 0.001) * level;
+                return getAttributeValue("skill_attributes.haste.attack_speed", level)
+                        + getAttributeValue("skill_attributes.haste.movement_speed", level);
             case "Precision":
-                return plugin.getConfig().getDouble("skill_attributes.precision.critical_rate", 0.75) * level / 100;
+                return getAttributeValue("skill_attributes.precision.critical_chance", level) / 100;
             case "Ferocity":
-                return plugin.getConfig().getDouble("skill_attributes.ferocity.critical_damage", 1.5) * level / 100;
+                return getAttributeValue("skill_attributes.ferocity.critical_damage", level) / 100;
             default:
                 return 0.0;
         }
@@ -108,7 +99,9 @@ public class SkillAttributes {
 
         // Apply Life Force modifier
         int lifeForceLevel = getAttributeLevel(playerUUID, "Life_Force");
-        modifyLifeForce(player, lifeForceLevel);
+        if (lifeForceLevel > 0) {
+            modifyLifeForce(player, lifeForceLevel);
+        }
 
         // Apply Strength modifier
         int strengthLevel = getAttributeLevel(playerUUID, "Strength");
@@ -157,39 +150,53 @@ public class SkillAttributes {
 
         // Check if the player has enough skill points to level up the attribute
         if (currentSkillPoints > 0) {
-            // Subtract one skill point
-            playerDataManager.setPlayerSkillPoints(playerUUID, currentSkillPoints - 1);
+            // Subtract one skill point and increase the attribute level
+            updatePlayerSkillPoints(playerUUID, currentSkillPoints - 1);
+            increaseAttributeLevel(playerUUID, attributeName);
 
-            // Increase the attribute level by 1
-            int currentAttributeLevel = getAttributeLevel(playerUUID, attributeName);
-            setAttributeLevel(playerUUID, attributeName, currentAttributeLevel + 1);
-
-            // Optionally, send a message to the player indicating the attribute level has increased
+            // Send a message to the player indicating the attribute level has increased
             Player player = Bukkit.getPlayer(playerUUID);
             if (player != null) {
-                player.sendMessage(Component.text("Leveled ", NamedTextColor.GREEN)
-                        .append(Component.text(attributeName, NamedTextColor.AQUA))
-                        .append(Component.text(" to ", NamedTextColor.GREEN))
-                        .append(Component.text(String.valueOf(currentAttributeLevel + 1), NamedTextColor.AQUA))
-                        .append(Component.text("!", NamedTextColor.GREEN)));
+                sendLevelUpMessage(player, attributeName, getAttributeLevel(playerUUID, attributeName));
                 applyModifierToPlayer(player);
             }
         } else {
-            // Optionally, send a message to the player indicating they don't have enough skill points
+            // Send a message to the player indicating they don't have enough skill points
             Player player = Bukkit.getPlayer(playerUUID);
             if (player != null) {
-                player.sendMessage(Component.text("Not enough skill points to level up ", NamedTextColor.RED)
-                        .append(Component.text(attributeName, NamedTextColor.AQUA))
-                        .append(Component.text(".", NamedTextColor.RED)));
+                sendInsufficientSkillPointsMessage(player, attributeName);
             }
         }
+    }
+
+    private void updatePlayerSkillPoints(UUID playerUUID, int newSkillPoints) {
+        playerDataManager.setPlayerSkillPoints(playerUUID, newSkillPoints);
+    }
+
+    private void increaseAttributeLevel(UUID playerUUID, String attributeName) {
+        int currentAttributeLevel = getAttributeLevel(playerUUID, attributeName);
+        setAttributeLevel(playerUUID, attributeName, currentAttributeLevel + 1);
+    }
+
+    private void sendLevelUpMessage(Player player, String attributeName, int newLevel) {
+        player.sendMessage(Component.text("Leveled ", NamedTextColor.GREEN)
+                .append(Component.text(attributeName, NamedTextColor.AQUA))
+                .append(Component.text(" to ", NamedTextColor.GREEN))
+                .append(Component.text(String.valueOf(newLevel), NamedTextColor.AQUA))
+                .append(Component.text("!", NamedTextColor.GREEN)));
+    }
+
+    private void sendInsufficientSkillPointsMessage(Player player, String attributeName) {
+        player.sendMessage(Component.text("Not enough skill points to level up ", NamedTextColor.RED)
+                .append(Component.text(attributeName, NamedTextColor.AQUA))
+                .append(Component.text(".", NamedTextColor.RED)));
     }
 
     // Method to get the level of a specific attribute
     public int getAttributeLevel(UUID playerUUID, String attributeName) {
         File playerDataFile = playerDataManager.getPlayerDataFile(playerUUID);
         YamlConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-        return playerDataConfig.getInt("Attributes." + attributeName, 1); // Default to 1 if level is not set
+        return playerDataConfig.getInt("Attributes." + attributeName, 0);
     }
 
     // Method to set the level of a specific attribute
@@ -204,20 +211,43 @@ public class SkillAttributes {
         }
     }
 
+    public List<String> getSkillValueString(String attributeName, int level) {
+        List<String> skillValues = new ArrayList<>();
+        switch (attributeName) {
+            case "Tenacity":
+                double toughnessValue = getAttributeValue("skill_attributes.tenacity.toughness", level);
+                double knockBackResistanceValue = getAttributeValue("skill_attributes.tenacity.knock_back_resistance", level);
+                skillValues.add("Toughness Value: " + String.format("%.2f", toughnessValue));
+                skillValues.add("Knockback Resistance Value: " + String.format("%.2f", knockBackResistanceValue));
+                break;
+            case "Haste":
+                double attackSpeedValue = getAttributeValue("skill_attributes.haste.attack_speed", level);
+                double movementSpeedValue = getAttributeValue("skill_attributes.haste.movement_speed", level);
+                skillValues.add("Attack Speed Value: " + String.format("%.2f", attackSpeedValue));
+                skillValues.add("Movement Speed Value: " + String.format("%.2f", movementSpeedValue));
+                break;
+            default:
+                double modifiedValue = getModifiedValue(attributeName, level);
+                skillValues.add("Skill Value: " + String.format("%.2f", modifiedValue));
+                break;
+        }
+        return skillValues;
+    }
+
     public String getAttributeDescription(String attributeName) {
         switch (attributeName) {
             case "Life_Force":
-                return "Increases max health by 1.0 per level.";
+                return "Increases max health by " + getAttributeValue("skill_attributes.life_force", 0) + " per level.";
             case "Strength":
-                return "Increases attack damage by 0.5 per level.";
+                return "Increases attack damage by " + getAttributeValue("skill_attributes.strength", 0) + " per level.";
             case "Tenacity":
-                return "Increases armor toughness by 0.0125 and knockback resistance by 0.003 per level.";
+                return "Increases armor toughness by " + getAttributeValue("skill_attributes.tenacity.toughness", 0) + " and knockback resistance by " + getAttributeValue("skill_attributes.tenacity.knock_back_resistance", 1) + " per level.";
             case "Haste":
-                return "Increases attack speed by 0.04 and movement speed by 0.01 per level.";
+                return "Increases attack speed by " + getAttributeValue("skill_attributes.haste.attack_speed", 0) + " and movement speed by " + getAttributeValue("skill_attributes.haste.movement_speed", 1) + " per level.";
             case "Precision":
-                return "Increase critical rate by 0.75% per level.";
+                return "Increase critical chance by " + getAttributeValue("skill_attributes.precision.critical_chance", 0) + "% per level.";
             case "Ferocity":
-                return "Increase critical damage by 1.5% per level.";
+                return "Increase critical damage by " + getAttributeValue("skill_attributes.ferocity.critical_damage", 0) + "% per level.";
             default:
                 return "Description not found.";
         }

@@ -58,7 +58,7 @@ public class EndlessGUIListener implements Listener {
                     UUID playerUUID = player.getUniqueId();
 
                     switch (text) {
-                        case "Life Force":
+                        case "Life_Force":
                             skillAttributes.useSkillPoint(playerUUID, "Life_Force");
                             break;
                         case "Strength":
