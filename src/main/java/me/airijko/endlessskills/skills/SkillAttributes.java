@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SkillAttributes {
 
@@ -31,6 +33,8 @@ public class SkillAttributes {
         AttributeInstance attributeInstance = player.getAttribute(attribute);
         if (attributeInstance != null) {
             attributeInstance.setBaseValue(attributeInstance.getBaseValue() + attributeValue);
+        } else {
+            plugin.getLogger().log(Level.INFO, "Attribute " + attribute + " is not accessible for player " + player.getName());
         }
     }
 
@@ -57,7 +61,7 @@ public class SkillAttributes {
     }
 
     public double modifyPrecision(int level) {
-        return getAttributeValue("skill_attributes.precision.critical_rate", level) / 100;
+        return getAttributeValue("skill_attributes.precision.critical_chance", level) / 100;
     }
 
     public double modifyFerocity(int level) {
@@ -78,7 +82,7 @@ public class SkillAttributes {
                 return getAttributeValue("skill_attributes.haste.attack_speed", level)
                         + getAttributeValue("skill_attributes.haste.movement_speed", level);
             case "Precision":
-                return getAttributeValue("skill_attributes.precision.critical_rate", level) / 100;
+                return getAttributeValue("skill_attributes.precision.critical_chance", level) / 100;
             case "Ferocity":
                 return getAttributeValue("skill_attributes.ferocity.critical_damage", level) / 100;
             default:
@@ -95,7 +99,9 @@ public class SkillAttributes {
 
         // Apply Life Force modifier
         int lifeForceLevel = getAttributeLevel(playerUUID, "Life_Force");
-        modifyLifeForce(player, lifeForceLevel);
+        if (lifeForceLevel > 0) {
+            modifyLifeForce(player, lifeForceLevel);
+        }
 
         // Apply Strength modifier
         int strengthLevel = getAttributeLevel(playerUUID, "Strength");
@@ -190,7 +196,7 @@ public class SkillAttributes {
     public int getAttributeLevel(UUID playerUUID, String attributeName) {
         File playerDataFile = playerDataManager.getPlayerDataFile(playerUUID);
         YamlConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-        return playerDataConfig.getInt("Attributes." + attributeName, 1); // Default to 1 if level is not set
+        return playerDataConfig.getInt("Attributes." + attributeName, 0);
     }
 
     // Method to set the level of a specific attribute
@@ -205,20 +211,43 @@ public class SkillAttributes {
         }
     }
 
+    public List<String> getSkillValueString(String attributeName, int level) {
+        List<String> skillValues = new ArrayList<>();
+        switch (attributeName) {
+            case "Tenacity":
+                double toughnessValue = getAttributeValue("skill_attributes.tenacity.toughness", level);
+                double knockBackResistanceValue = getAttributeValue("skill_attributes.tenacity.knock_back_resistance", level);
+                skillValues.add("Toughness Value: " + String.format("%.2f", toughnessValue));
+                skillValues.add("Knockback Resistance Value: " + String.format("%.2f", knockBackResistanceValue));
+                break;
+            case "Haste":
+                double attackSpeedValue = getAttributeValue("skill_attributes.haste.attack_speed", level);
+                double movementSpeedValue = getAttributeValue("skill_attributes.haste.movement_speed", level);
+                skillValues.add("Attack Speed Value: " + String.format("%.2f", attackSpeedValue));
+                skillValues.add("Movement Speed Value: " + String.format("%.2f", movementSpeedValue));
+                break;
+            default:
+                double modifiedValue = getModifiedValue(attributeName, level);
+                skillValues.add("Skill Value: " + String.format("%.2f", modifiedValue));
+                break;
+        }
+        return skillValues;
+    }
+
     public String getAttributeDescription(String attributeName) {
         switch (attributeName) {
             case "Life_Force":
-                return "Increases max health by " + getAttributeValue("skill_attributes.life_force", 1) + " per level.";
+                return "Increases max health by " + getAttributeValue("skill_attributes.life_force", 0) + " per level.";
             case "Strength":
-                return "Increases attack damage by " + getAttributeValue("skill_attributes.strength", 1) + " per level.";
+                return "Increases attack damage by " + getAttributeValue("skill_attributes.strength", 0) + " per level.";
             case "Tenacity":
-                return "Increases armor toughness by " + getAttributeValue("skill_attributes.tenacity.toughness", 1) + " and knockback resistance by " + getAttributeValue("skill_attributes.tenacity.knock_back_resistance", 1) + " per level.";
+                return "Increases armor toughness by " + getAttributeValue("skill_attributes.tenacity.toughness", 0) + " and knockback resistance by " + getAttributeValue("skill_attributes.tenacity.knock_back_resistance", 1) + " per level.";
             case "Haste":
-                return "Increases attack speed by " + getAttributeValue("skill_attributes.haste.attack_speed", 1) + " and movement speed by " + getAttributeValue("skill_attributes.haste.movement_speed", 1) + " per level.";
+                return "Increases attack speed by " + getAttributeValue("skill_attributes.haste.attack_speed", 0) + " and movement speed by " + getAttributeValue("skill_attributes.haste.movement_speed", 1) + " per level.";
             case "Precision":
-                return "Increase critical rate by " + getAttributeValue("skill_attributes.precision.critical_rate", 1) + "% per level.";
+                return "Increase critical chance by " + getAttributeValue("skill_attributes.precision.critical_chance", 0) + "% per level.";
             case "Ferocity":
-                return "Increase critical damage by " + getAttributeValue("skill_attributes.ferocity.critical_damage", 1) + "% per level.";
+                return "Increase critical damage by " + getAttributeValue("skill_attributes.ferocity.critical_damage", 0) + "% per level.";
             default:
                 return "Description not found.";
         }

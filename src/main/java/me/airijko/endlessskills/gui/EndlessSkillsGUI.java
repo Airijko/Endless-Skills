@@ -100,12 +100,14 @@ public class EndlessSkillsGUI {
         if (meta != null) {
             meta.displayName(Component.text(displayName, color));
             int level = Integer.parseInt(attributeLevel);
-            String additionalLine = "Modified Value: " + skillAttributes.getModifiedValue(attributeName, level);
-            meta.lore(Arrays.asList(
-                    Component.text("Level: " + attributeLevel, NamedTextColor.GRAY),
-                    Component.text(description, NamedTextColor.GRAY),
-                    Component.text(additionalLine, NamedTextColor.GRAY)
-            ));
+            List<String> additionalLines = skillAttributes.getSkillValueString(attributeName, level);
+            List<Component> lore = new ArrayList<>();
+            lore.add(Component.text("Level: " + attributeLevel, NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text(description, NamedTextColor.GRAY));
+            for (String line : additionalLines) {
+                lore.add(Component.text(line, NamedTextColor.DARK_GRAY));
+            }
+            meta.lore(lore);
             woolItem.setItemMeta(meta);
         }
         return woolItem;
