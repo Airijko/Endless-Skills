@@ -1,13 +1,16 @@
 name: EndlessSkills
-version: '1.0'
+version: '1.1'
 main: me.airijko.endlessskills.EndlessSkills
 api-version: '1.20'
 commands:
   endless:
     description: Main command for EndlessSkills plugin.
-    usage: /<command> [reload|skills|resetattributes]
+    usage: /<command> [reload|skills|resetattributes|level]
   reload:
     description: Reloads the plugin.
+    usage: /<command>
+  skills:
+    description: Opens the skills GUI.
     usage: /<command>
   resetattributes:
     description: Resets the attributes.

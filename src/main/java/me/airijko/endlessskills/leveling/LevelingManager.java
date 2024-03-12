@@ -1,5 +1,6 @@
 package me.airijko.endlessskills.leveling;
 
+import me.airijko.endlessskills.managers.ConfigManager;
 import me.airijko.endlessskills.managers.PlayerDataManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -19,16 +20,19 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import sun.security.krb5.Config;
 
 public class LevelingManager {
     private final JavaPlugin plugin;
+    private final ConfigManager configManager;
     private final PlayerDataManager playerDataManager;
     private final LevelConfiguration levelConfiguration;
     private final Map<UUID, BossBar> playerBossBars = new HashMap<>();
     private final Map<UUID, BukkitTask> removalTasks = new HashMap<>();
 
-    public LevelingManager(JavaPlugin plugin, PlayerDataManager playerDataManager, LevelConfiguration levelConfiguration) {
+    public LevelingManager(JavaPlugin plugin, ConfigManager configManager, PlayerDataManager playerDataManager, LevelConfiguration levelConfiguration) {
         this.plugin = plugin;
+        this.configManager = configManager;
         this.playerDataManager = playerDataManager;
         this.levelConfiguration = levelConfiguration;
     }
@@ -58,7 +62,7 @@ public class LevelingManager {
 
     public boolean playerLevelUp(Player player) {
         UUID playerUUID = player.getUniqueId();
-        int currentXP = playerDataManager.getPlayerXP(playerUUID);
+        double currentXP = playerDataManager.getPlayerXP(playerUUID);
         int currentLevel = playerDataManager.getPlayerLevel(playerUUID);
         double xpForNextLevel = levelConfiguration.calculateThreshold(currentLevel);
 
@@ -68,7 +72,7 @@ public class LevelingManager {
             playerDataManager.setPlayerLevel(playerUUID, newLevel);
 
             // Calculate the excess XP
-            int excessXP = (int) (currentXP - xpForNextLevel);
+            double excessXP = (currentXP - xpForNextLevel);
 
             // Retrieve the skill points to add from the configuration
             int skillPointsToAdd = levelConfiguration.getSkillPointsPerLevel();
@@ -102,9 +106,10 @@ public class LevelingManager {
         playerDataManager.setPlayerSkillPoints(playerUUID, totalSkillPoints);
     }
 
-    private void displayXPGainedMessage(Player player, int newXP, double xpThresholdForNextLevel) {
+    private void displayXPGainedMessage(Player player, double newXP, double xpThresholdForNextLevel) {
         UUID playerUUID = player.getUniqueId();
-        Component bossBarTitleComponent = Component.text("+" + newXP + " / " + (int) xpThresholdForNextLevel + " XP", NamedTextColor.GREEN);
+        String formattedXP = String.format("%.2f", newXP);
+        Component bossBarTitleComponent = Component.text(formattedXP + " / " + (int) xpThresholdForNextLevel + " XP", NamedTextColor.GREEN);
         String bossBarTitle = LegacyComponentSerializer.legacySection().serialize(bossBarTitleComponent);
 
         // Check if a boss bar already exists for the player
@@ -152,10 +157,15 @@ public class LevelingManager {
         removalTasks.put(playerUUID, removalTask);
     }
 
-    public void handleXP(Player player, int XPGain) {
+    public void handleXP(Player player, double XPGain, boolean isFromBlock) {
         UUID playerUUID = player.getUniqueId();
-        int currentXP = playerDataManager.getPlayerXP(playerUUID);
-        int newXP = currentXP + XPGain;
+        boolean gainXPFromBlocks = configManager.getConfig().getBoolean("gain_xp_from_blocks", true);
+        double currentXP = playerDataManager.getPlayerXP(playerUUID);
+        double newXP = currentXP + XPGain;
+
+        if (isFromBlock && !gainXPFromBlocks) {
+            return; // If so, do not award the XP and return
+        }
 
         // Update the player's XP
         playerDataManager.setPlayerXP(playerUUID, newXP);

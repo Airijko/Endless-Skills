@@ -1,5 +1,6 @@
 package me.airijko.endlessskills.skills;
 
+import me.airijko.endlessskills.managers.ConfigManager;
 import me.airijko.endlessskills.managers.PlayerDataManager;
 
 import net.kyori.adventure.text.Component;
@@ -21,10 +22,12 @@ import java.util.List;
 public class SkillAttributes {
 
     private final JavaPlugin plugin;
+    private final ConfigManager configManager;
     private final PlayerDataManager playerDataManager;
 
-    public SkillAttributes(JavaPlugin plugin, PlayerDataManager playerDataManager) {
+    public SkillAttributes(JavaPlugin plugin, ConfigManager configManager, PlayerDataManager playerDataManager) {
         this.plugin = plugin;
+        this.configManager = configManager;
         this.playerDataManager = playerDataManager;
     }
 
@@ -39,7 +42,7 @@ public class SkillAttributes {
     }
 
     private double getAttributeValue(String configKey, int level) {
-        return plugin.getConfig().getDouble(configKey, 0.0) * level;
+        return configManager.getConfig().getDouble(configKey, 0.0) * level;
     }
 
     public void modifyLifeForce(Player player, int level) {
@@ -135,6 +138,7 @@ public class SkillAttributes {
             attributeInstance.setBaseValue(value);
         }
     }
+
     public static void resetAllAttributesToDefault(Player player) {
         resetAttribute(player, Attribute.GENERIC_MAX_HEALTH, 20.0); // Default max health
         resetAttribute(player, Attribute.GENERIC_ATTACK_DAMAGE, 2.0); // Default attack damage
@@ -226,6 +230,14 @@ public class SkillAttributes {
                 skillValues.add("Attack Speed Value: " + String.format("%.2f", attackSpeedValue));
                 skillValues.add("Movement Speed Value: " + String.format("%.2f", movementSpeedValue));
                 break;
+            case "Precision":
+                double precisionValue = getAttributeValue("skill_attributes.precision.critical_chance", level);
+                skillValues.add("Critical Chance Value: " + String.format("%.2f", precisionValue) + "%");
+                break;
+            case "Ferocity":
+                double ferocityValue = getAttributeValue("skill_attributes.ferocity.critical_damage", level);
+                skillValues.add("Critical Damage Value: " + "+" + String.format("%.2f", ferocityValue) + "%");
+                break;
             default:
                 double modifiedValue = getModifiedValue(attributeName, level);
                 skillValues.add("Skill Value: " + String.format("%.2f", modifiedValue));
@@ -237,17 +249,17 @@ public class SkillAttributes {
     public String getAttributeDescription(String attributeName) {
         switch (attributeName) {
             case "Life_Force":
-                return "Increases max health by " + getAttributeValue("skill_attributes.life_force", 0) + " per level.";
+                return "Increases max health by " + getAttributeValue("skill_attributes.life_force", 1) + " per level.";
             case "Strength":
-                return "Increases attack damage by " + getAttributeValue("skill_attributes.strength", 0) + " per level.";
+                return "Increases attack damage by " + getAttributeValue("skill_attributes.strength", 1) + " per level.";
             case "Tenacity":
-                return "Increases armor toughness by " + getAttributeValue("skill_attributes.tenacity.toughness", 0) + " and knockback resistance by " + getAttributeValue("skill_attributes.tenacity.knock_back_resistance", 1) + " per level.";
+                return "Increases armor toughness by " + getAttributeValue("skill_attributes.tenacity.toughness", 1) + " and knockback resistance by " + getAttributeValue("skill_attributes.tenacity.knock_back_resistance", 1) + " per level.";
             case "Haste":
-                return "Increases attack speed by " + getAttributeValue("skill_attributes.haste.attack_speed", 0) + " and movement speed by " + getAttributeValue("skill_attributes.haste.movement_speed", 1) + " per level.";
+                return "Increases attack speed by " + getAttributeValue("skill_attributes.haste.attack_speed", 1) + " and movement speed by " + getAttributeValue("skill_attributes.haste.movement_speed", 1) + " per level.";
             case "Precision":
-                return "Increase critical chance by " + getAttributeValue("skill_attributes.precision.critical_chance", 0) + "% per level.";
+                return "Increase critical chance by " + getAttributeValue("skill_attributes.precision.critical_chance", 1) + "% per level.";
             case "Ferocity":
-                return "Increase critical damage by " + getAttributeValue("skill_attributes.ferocity.critical_damage", 0) + "% per level.";
+                return "Increase critical damage by " + getAttributeValue("skill_attributes.ferocity.critical_damage", 1) + "% per level.";
             default:
                 return "Description not found.";
         }

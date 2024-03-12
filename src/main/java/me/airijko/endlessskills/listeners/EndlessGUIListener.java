@@ -13,6 +13,8 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -26,8 +28,7 @@ public class EndlessGUIListener implements Listener {
     }
 
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
-
+    public void handleEndlessGUI(InventoryClickEvent event) {
         // Retrieve the Inventory object from the EndlessSkillsGUI instance
         Inventory guiInventory = endlessSkillsGUI.getInventory();
 
@@ -35,50 +36,53 @@ public class EndlessGUIListener implements Listener {
         if (event.getClickedInventory() != null && event.getClickedInventory().equals(guiInventory)) {
 
             // Check for actions that could move items out of the GUI
-            if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY ||
-                    event.getAction() == InventoryAction.PICKUP_ALL ||
-                    event.getAction() == InventoryAction.PICKUP_HALF ||
-                    event.getAction() == InventoryAction.PICKUP_ONE ||
-                    event.getAction() == InventoryAction.PICKUP_SOME) {
-                // Cancel the event to prevent any interaction with the custom GUI
-                event.setCancelled(true);
+            if (event.getClickedInventory() != null && event.getClickedInventory().equals(guiInventory)) {
+                cancelItemMovement(event);
+
+                // Handle attribute level increase
+                Player player = (Player) event.getWhoClicked();
+                UUID playerUUID = player.getUniqueId();
+
+                Map<String, Runnable> actionMap = new HashMap<>();
+                actionMap.put("Life_Force", () -> skillAttributes.useSkillPoint(playerUUID, "Life_Force"));
+                actionMap.put("Strength", () -> skillAttributes.useSkillPoint(playerUUID, "Strength"));
+                actionMap.put("Tenacity", () -> skillAttributes.useSkillPoint(playerUUID, "Tenacity"));
+                actionMap.put("Haste", () -> skillAttributes.useSkillPoint(playerUUID, "Haste"));
+                actionMap.put("Precision", () -> skillAttributes.useSkillPoint(playerUUID, "Precision"));
+                actionMap.put("Ferocity", () -> skillAttributes.useSkillPoint(playerUUID, "Ferocity"));
+
+                handleAction(event, actionMap);
+
+                endlessSkillsGUI.skillAttributesGUI(player);
             }
+        }
+    }
 
-            // Handle attribute level increase
-            if (event.getCurrentItem() != null) {
-                ItemMeta itemMeta = event.getCurrentItem().getItemMeta();
+    private void cancelItemMovement(InventoryClickEvent event) {
+        // Check for actions that could move items out of the GUI
+        if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY ||
+                event.getAction() == InventoryAction.PICKUP_ALL ||
+                event.getAction() == InventoryAction.PICKUP_HALF ||
+                event.getAction() == InventoryAction.PICKUP_ONE ||
+                event.getAction() == InventoryAction.PICKUP_SOME) {
+            // Cancel the event to prevent any interaction with the custom GUI
+            event.setCancelled(true);
+        }
+    }
 
-                if (itemMeta != null) {
-                    String displayName = GsonComponentSerializer.gson().serialize(Objects.requireNonNull(itemMeta.displayName()));
-                    Gson gson = new Gson();
-                    JsonObject jsonObject = gson.fromJson(displayName, JsonObject.class);
-                    String text = jsonObject.get("text").getAsString();
+    private void handleAction(InventoryClickEvent event, Map<String, Runnable> actionMap) {
+        if (event.getCurrentItem() != null) {
+            ItemMeta itemMeta = event.getCurrentItem().getItemMeta();
 
-                    Player player = (Player) event.getWhoClicked();
-                    UUID playerUUID = player.getUniqueId();
+            if (itemMeta != null) {
+                String displayName = GsonComponentSerializer.gson().serialize(Objects.requireNonNull(itemMeta.displayName()));
+                Gson gson = new Gson();
+                JsonObject jsonObject = gson.fromJson(displayName, JsonObject.class);
+                String text = jsonObject.get("text").getAsString();
 
-                    switch (text) {
-                        case "Life_Force":
-                            skillAttributes.useSkillPoint(playerUUID, "Life_Force");
-                            break;
-                        case "Strength":
-                            skillAttributes.useSkillPoint(playerUUID, "Strength");
-                            break;
-                        case "Tenacity":
-                            skillAttributes.useSkillPoint(playerUUID, "Tenacity");
-                            break;
-                        case "Haste":
-                            skillAttributes.useSkillPoint(playerUUID, "Haste");
-                            break;
-                        case "Precision":
-                            skillAttributes.useSkillPoint(playerUUID, "Precision");
-                            break;
-                        case "Ferocity":
-                            skillAttributes.useSkillPoint(playerUUID, "Ferocity");
-                            break;
-                    }
-
-                    endlessSkillsGUI.skillAttributesGUI(player);
+                Runnable action = actionMap.get(text);
+                if (action != null) {
+                    action.run();
                 }
             }
         }

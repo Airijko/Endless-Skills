@@ -131,4 +131,26 @@ public class EndlessSkillsGUI {
             }
         }
     }
+
+    public void closeForAllPlayers() {
+        Bukkit.getLogger().info("Closing skills GUI for all online players...");
+
+        Inventory guiInventory = getInventory(); // Get the custom GUI's inventory
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Inventory openInventory = player.getOpenInventory().getTopInventory();
+            if (openInventory.equals(guiInventory)) { // Check if the open inventory is the custom GUI's inventory
+                player.closeInventory();
+                Bukkit.getLogger().info("Closed skills GUI for player: " + player.getName());
+            } else {
+                if (openInventory.getHolder() != null) {
+                    Bukkit.getLogger().info("Player " + player.getName() + " has a different inventory open: " + openInventory.getHolder().getClass().getName());
+                } else {
+                    Bukkit.getLogger().info("Player " + player.getName() + " has a different inventory open: null");
+                }
+            }
+        }
+
+        Bukkit.getLogger().info("Finished closing skills GUI for all online players.");
+    }
 }

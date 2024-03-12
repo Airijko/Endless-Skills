@@ -1,5 +1,6 @@
 package me.airijko.endlessskills.listeners;
 
+import me.airijko.endlessskills.managers.ConfigManager;
 import me.airijko.endlessskills.skills.SkillAttributes;
 import me.airijko.endlessskills.combat.DamageHologram;
 
@@ -17,13 +18,15 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class DamageListener implements Listener {
+    private final JavaPlugin plugin;
+    private final ConfigManager configManager;
     private final SkillAttributes skillAttributes;
     private final HashMap<UUID, Boolean> eventProcessed = new HashMap<>();
-    private final JavaPlugin plugin;
 
-    public DamageListener(SkillAttributes skillAttributes, JavaPlugin plugin) {
-        this.skillAttributes = skillAttributes;
+    public DamageListener(JavaPlugin plugin, SkillAttributes skillAttributes, ConfigManager configManager) {
         this.plugin = plugin;
+        this.configManager = configManager;
+        this.skillAttributes = skillAttributes;
     }
 
     @EventHandler
@@ -60,7 +63,7 @@ public class DamageListener implements Listener {
 
             // Display the damage hologram
             Location location = entity.getLocation(); // Use the entity's location
-            DamageHologram hologram = new DamageHologram(plugin, location, String.valueOf(damageValue), isCritical);
+            DamageHologram hologram = new DamageHologram(configManager, location, damageValue, isCritical);
             Bukkit.getScheduler().runTaskLater(plugin, hologram::remove, 40L);
 
             // Mark the event as processed for this player

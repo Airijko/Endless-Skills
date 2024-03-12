@@ -15,3 +15,6 @@ skill_attributes:
 
 # Setting for enabling/disabling the damage hologram
 damage_hologram_enabled: true
+
+# Setting for enabling/disabling the xp gain from blocks
+gain_xp_from_blocks: true

@@ -9,19 +9,22 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import org.bukkit.configuration.ConfigurationSection;
 
 public class XPConfiguration {
 
     private final JavaPlugin plugin;
-    private final Map<String, Integer> mobXPMap;
-    private final int fallbackXP;
+    private final Map<String, Double> mobXPMap;
+    private final Map<String, Double> blockXPMap;
+    private final double fallbackXP;
 
     public XPConfiguration(JavaPlugin plugin) {
         this.plugin = plugin;
         this.mobXPMap = new HashMap<>();
-        this.fallbackXP = 1;
+        this.blockXPMap = new HashMap<>();
+        this.fallbackXP = 0.1;
         loadXPConfiguration();
     }
 
@@ -45,15 +48,38 @@ public class XPConfiguration {
         ConfigurationSection mobsSection = xpSourcesConfig.getConfigurationSection("mobs");
         if (mobsSection != null) {
             for (String mobName : mobsSection.getKeys(false)) {
-                mobXPMap.put(mobName, mobsSection.getInt(mobName));
+                mobXPMap.put(mobName, mobsSection.getDouble(mobName));
             }
         } else {
             plugin.getLogger().log(Level.SEVERE, "Failed to load mobs from xp_sources.yml.");
         }
+
+        // Load the blocks from the 'blocks' section into the blockXPMap
+        ConfigurationSection blocksSection = xpSourcesConfig.getConfigurationSection("blocks");
+        if (blocksSection != null) {
+            for (String blockName : blocksSection.getKeys(false)) {
+                blockXPMap.put(blockName, blocksSection.getDouble(blockName));
+            }
+        } else {
+            plugin.getLogger().log(Level.SEVERE, "Failed to load blocks from xp_sources.yml.");
+        }
     }
 
-    public int getXPForMob(String mobName) {
+    public Set<String> getMobNames() {
+        return mobXPMap.keySet();
+    }
+
+    public Set<String> getBlockNames() {
+        return blockXPMap.keySet();
+    }
+
+    public double getXPForMob(String mobName) {
         // Return the XP for the given mob, or the fallback value if the mob is not found
         return mobXPMap.getOrDefault(mobName, fallbackXP);
+    }
+
+    public double getXPForBlock(String blockName) {
+        // Return the XP for the given block, or the fallback value if the block is not found
+        return blockXPMap.getOrDefault(blockName, fallbackXP);
     }
 }

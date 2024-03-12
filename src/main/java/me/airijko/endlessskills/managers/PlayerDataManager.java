@@ -86,10 +86,10 @@ public class PlayerDataManager {
         return playerDataConfig.getInt("Level", 1); // Default to 1 if "Level" is not set
     }
 
-    public int getPlayerXP(UUID playerUUID) {
+    public double getPlayerXP(UUID playerUUID) {
         File playerDataFile = getPlayerDataFile(playerUUID);
         YamlConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-        return playerDataConfig.getInt("XP", 0);
+        return playerDataConfig.getDouble("XP", 0);
     }
 
     public void setPlayerLevel(UUID playerUUID, int level) {
@@ -103,7 +103,7 @@ public class PlayerDataManager {
         }
     }
 
-    public void setPlayerXP(UUID playerUUID, int xp) {
+    public void setPlayerXP(UUID playerUUID, double xp) {
         File playerDataFile = getPlayerDataFile(playerUUID);
         YamlConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
         playerDataConfig.set("XP", xp);

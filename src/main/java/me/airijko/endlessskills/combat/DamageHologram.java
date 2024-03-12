@@ -1,20 +1,18 @@
 package me.airijko.endlessskills.combat;
 
+import me.airijko.endlessskills.managers.ConfigManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import java.util.Random;
 
 public class DamageHologram {
     private final ArmorStand armorStand;
     private static final Random random = new Random();
 
-    public DamageHologram(JavaPlugin plugin, Location location, String message, boolean isCritical) {
-
-        boolean isEnabled = plugin.getConfig().getBoolean("damage_hologram_enabled", true);
+    public DamageHologram(ConfigManager configManager, Location location, double damage, boolean isCritical) {
+        boolean isEnabled = configManager.getConfig().getBoolean("damage_hologram_enabled", true);
 
         if (!isEnabled) {
             this.armorStand = null;
@@ -31,7 +29,8 @@ public class DamageHologram {
         this.armorStand = (ArmorStand) offsetLocation.getWorld().spawnEntity(offsetLocation, EntityType.ARMOR_STAND);
         this.armorStand.setGravity(true);
         this.armorStand.setCanPickupItems(false);
-        String formattedMessage = isCritical ? "§c§l\uD83D\uDCA5" + message : "§7" + message;
+        long roundedDamage = Math.round(damage);
+        String formattedMessage = isCritical ? "§c§l\uD83D\uDCA5" + roundedDamage : "§7" + roundedDamage;
         // Convert the formattedMessage to a Component
         Component componentMessage = Component.text(formattedMessage);
         this.armorStand.customName(componentMessage);
