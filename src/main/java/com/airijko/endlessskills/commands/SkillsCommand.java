@@ -1,6 +1,6 @@
-package me.airijko.endlessskills.commands;
+package com.airijko.endlessskills.commands;
 
-import me.airijko.endlessskills.gui.EndlessSkillsGUI;
+import com.airijko.endlessskills.gui.EndlessSkillsGUI;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

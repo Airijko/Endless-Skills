@@ -50,7 +50,7 @@ skillPointsPerLevel: 3
 # Compare this snippet from src/main/resources/plugin.yml:
 # name: EndlessSkills
 # version: '1.0'
-# main: me.airijko.endlessskills.EndlessSkills
+# main: com.airijko.endlessskills.EndlessSkills
 # api-version: '1.20'
 # commands:
 #   endless:

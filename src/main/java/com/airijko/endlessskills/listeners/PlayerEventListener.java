@@ -1,6 +1,6 @@
-package me.airijko.endlessskills.listeners;
+package com.airijko.endlessskills.listeners;
 
-import me.airijko.endlessskills.managers.PlayerDataManager;
+import com.airijko.endlessskills.managers.PlayerDataManager;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

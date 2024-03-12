@@ -1,21 +1,19 @@
-package me.airijko.endlessskills;
+package com.airijko.endlessskills;
 
-import me.airijko.endlessskills.commands.LevelCommand;
-import me.airijko.endlessskills.managers.PlayerDataManager;
-import me.airijko.endlessskills.managers.ConfigManager;
-import me.airijko.endlessskills.leveling.XPConfiguration;
-import me.airijko.endlessskills.leveling.LevelingManager;
-import me.airijko.endlessskills.leveling.LevelConfiguration;
-import me.airijko.endlessskills.commands.ResetAttributesCommand;
-import me.airijko.endlessskills.commands.ReloadCommand;
-import me.airijko.endlessskills.commands.EndlessCommand;
-import me.airijko.endlessskills.gui.EndlessSkillsGUI;
-import me.airijko.endlessskills.skills.SkillAttributes;
+import com.airijko.endlessskills.commands.EndlessCommand;
+import com.airijko.endlessskills.commands.ResetAttributesCommand;
+import com.airijko.endlessskills.gui.EndlessSkillsGUI;
+import com.airijko.endlessskills.leveling.LevelingManager;
+import com.airijko.endlessskills.commands.LevelCommand;
+import com.airijko.endlessskills.listeners.*;
+import com.airijko.endlessskills.managers.PlayerDataManager;
+import com.airijko.endlessskills.managers.ConfigManager;
+import com.airijko.endlessskills.leveling.XPConfiguration;
+import com.airijko.endlessskills.leveling.LevelConfiguration;
+import com.airijko.endlessskills.commands.ReloadCommand;
+import com.airijko.endlessskills.skills.SkillAttributes;
 
-import me.airijko.endlessskills.listeners.PlayerEventListener;
-import me.airijko.endlessskills.listeners.ExperienceTracker;
-import me.airijko.endlessskills.listeners.EndlessGUIListener;
-import me.airijko.endlessskills.listeners.DamageListener;
+import com.airijko.endlessskills.listeners.MobEventListener;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -54,9 +52,9 @@ public final class EndlessSkills extends JavaPlugin {
         playerDataManager.loadPlayerDataFolder();
         skillAttributes.applyModifiersToAllPlayers();
 
-        getServer().getPluginManager().registerEvents(playerEventListener, this);
-        getServer().getPluginManager().registerEvents(new ExperienceTracker(configManager, xpConfiguration, levelingManager), this);
-        getServer().getPluginManager().registerEvents(new DamageListener(this, skillAttributes, configManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerCombatListener(this, configManager, skillAttributes), this);
+        getServer().getPluginManager().registerEvents(new MobEventListener(xpConfiguration, levelingManager), this);
+        getServer().getPluginManager().registerEvents(new BlockActivityListener(configManager, xpConfiguration, levelingManager), this);
         getServer().getPluginManager().registerEvents(new EndlessGUIListener(endlessSkillsGUI, skillAttributes), this);
 
         Objects.requireNonNull(getCommand("endless")).setExecutor(new EndlessCommand(endlessSkillsGUI, reloadCommand, resetAttributesCommand, levelCommand));

@@ -1,4 +1,4 @@
-package me.airijko.endlessskills.leveling;
+package com.airijko.endlessskills.leveling;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -63,14 +63,6 @@ public class XPConfiguration {
         } else {
             plugin.getLogger().log(Level.SEVERE, "Failed to load blocks from xp_sources.yml.");
         }
-    }
-
-    public Set<String> getMobNames() {
-        return mobXPMap.keySet();
-    }
-
-    public Set<String> getBlockNames() {
-        return blockXPMap.keySet();
     }
 
     public double getXPForMob(String mobName) {

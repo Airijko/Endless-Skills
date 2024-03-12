@@ -1,14 +1,13 @@
-package me.airijko.endlessskills.gui;
+package com.airijko.endlessskills.gui;
 
-import me.airijko.endlessskills.managers.PlayerDataManager;
-import me.airijko.endlessskills.skills.SkillAttributes;
+import com.airijko.endlessskills.managers.PlayerDataManager;
+import com.airijko.endlessskills.skills.SkillAttributes;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;

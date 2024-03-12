@@ -1,4 +1,4 @@
-package me.airijko.endlessskills.leveling;
+package com.airijko.endlessskills.leveling;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.YamlConfiguration;

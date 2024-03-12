@@ -1,7 +1,7 @@
-package me.airijko.endlessskills.skills;
+package com.airijko.endlessskills.skills;
 
-import me.airijko.endlessskills.managers.ConfigManager;
-import me.airijko.endlessskills.managers.PlayerDataManager;
+import com.airijko.endlessskills.managers.ConfigManager;
+import com.airijko.endlessskills.managers.PlayerDataManager;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -11,6 +11,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SkillAttributes {
-
     private final JavaPlugin plugin;
     private final ConfigManager configManager;
     private final PlayerDataManager playerDataManager;
@@ -49,10 +49,6 @@ public class SkillAttributes {
         modifyAttribute(player, level, "skill_attributes.life_force", Attribute.GENERIC_MAX_HEALTH);
     }
 
-    public void modifyStrength(Player player, int level) {
-        modifyAttribute(player, level, "skill_attributes.strength", Attribute.GENERIC_ATTACK_DAMAGE);
-    }
-
     public void modifyTenacity(Player player, int level) {
         modifyAttribute(player, level, "skill_attributes.tenacity.toughness", Attribute.GENERIC_ARMOR_TOUGHNESS);
         modifyAttribute(player, level, "skill_attributes.tenacity.knock_back_resistance", Attribute.GENERIC_KNOCKBACK_RESISTANCE);
@@ -63,14 +59,25 @@ public class SkillAttributes {
         modifyAttribute(player, level, "skill_attributes.haste.movement_speed", Attribute.GENERIC_MOVEMENT_SPEED);
     }
 
-    public double modifyPrecision(int level) {
-        return getAttributeValue("skill_attributes.precision.critical_chance", level) / 100;
+    public boolean modifyPrecision(int level) {
+        double precisionValue = getAttributeValue("skill_attributes.precision.critical_chance", level) / 100;
+        return Math.random() < precisionValue;
     }
 
-    public double modifyFerocity(int level) {
-        return getAttributeValue("skill_attributes.ferocity.critical_damage", level) / 100;
+    public void modifyFerocity(int level, EntityDamageByEntityEvent event, boolean isCriticalHit) {
+        if (isCriticalHit) {
+            double ferocityValue = getAttributeValue("skill_attributes.ferocity.critical_damage", level) / 100;
+            double damageValue = event.getDamage();
+            damageValue += damageValue * ferocityValue;
+            event.setDamage(damageValue);
+        }
     }
 
+    public boolean handleCriticalHit(int level, EntityDamageByEntityEvent event) {
+        boolean isCriticalHit = modifyPrecision(level);
+        modifyFerocity(level, event, isCriticalHit);
+        return isCriticalHit;
+    }
 
     public double getModifiedValue(String attributeName, int level) {
         switch (attributeName) {
@@ -106,10 +113,6 @@ public class SkillAttributes {
             modifyLifeForce(player, lifeForceLevel);
         }
 
-        // Apply Strength modifier
-        int strengthLevel = getAttributeLevel(playerUUID, "Strength");
-        modifyStrength(player, strengthLevel);
-
         // Apply Tenacity modifier
         int tenacityLevel = getAttributeLevel(playerUUID, "Tenacity");
         modifyTenacity(player, tenacityLevel);
@@ -117,13 +120,6 @@ public class SkillAttributes {
         // Apply Haste modifier
         int hasteLevel = getAttributeLevel(playerUUID, "Haste");
         modifyHaste(player, hasteLevel);
-
-        // Apply Precision modifier
-        int precisionLevel = getAttributeLevel(playerUUID, "Precision");
-        modifyPrecision(precisionLevel);
-
-        int ferocityLevel = getAttributeLevel(playerUUID, "Ferocity");
-        modifyPrecision(ferocityLevel);
     }
 
     public void applyModifiersToAllPlayers() {

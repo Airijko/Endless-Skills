@@ -1,13 +1,13 @@
-package me.airijko.endlessskills.commands;
+package com.airijko.endlessskills.commands;
 
+import com.airijko.endlessskills.gui.EndlessSkillsGUI;
+import com.airijko.endlessskills.leveling.LevelConfiguration;
+import com.airijko.endlessskills.leveling.XPConfiguration;
+import com.airijko.endlessskills.managers.ConfigManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import me.airijko.endlessskills.managers.ConfigManager;
-import me.airijko.endlessskills.gui.EndlessSkillsGUI;
-import me.airijko.endlessskills.leveling.XPConfiguration;
-import me.airijko.endlessskills.leveling.LevelConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 public class ReloadCommand implements CommandExecutor {

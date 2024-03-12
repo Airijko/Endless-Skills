@@ -1,6 +1,6 @@
-package me.airijko.endlessskills.managers;
+package com.airijko.endlessskills.managers;
 
-import me.airijko.endlessskills.skills.SkillAttributes;
+import com.airijko.endlessskills.skills.SkillAttributes;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;

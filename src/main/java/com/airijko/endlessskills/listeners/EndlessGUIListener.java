@@ -1,9 +1,9 @@
-package me.airijko.endlessskills.listeners;
+package com.airijko.endlessskills.listeners;
 
+import com.airijko.endlessskills.gui.EndlessSkillsGUI;
+import com.airijko.endlessskills.skills.SkillAttributes;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import me.airijko.endlessskills.gui.EndlessSkillsGUI;
-import me.airijko.endlessskills.skills.SkillAttributes;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

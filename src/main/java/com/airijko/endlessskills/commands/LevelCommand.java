@@ -1,7 +1,7 @@
-package me.airijko.endlessskills.commands;
+package com.airijko.endlessskills.commands;
 
-import me.airijko.endlessskills.leveling.LevelingManager;
-import me.airijko.endlessskills.managers.PlayerDataManager;
+import com.airijko.endlessskills.leveling.LevelingManager;
+import com.airijko.endlessskills.managers.PlayerDataManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

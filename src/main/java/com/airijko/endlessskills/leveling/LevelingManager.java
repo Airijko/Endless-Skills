@@ -1,7 +1,7 @@
-package me.airijko.endlessskills.leveling;
+package com.airijko.endlessskills.leveling;
 
-import me.airijko.endlessskills.managers.ConfigManager;
-import me.airijko.endlessskills.managers.PlayerDataManager;
+import com.airijko.endlessskills.managers.ConfigManager;
+import com.airijko.endlessskills.managers.PlayerDataManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -20,7 +20,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import sun.security.krb5.Config;
 
 public class LevelingManager {
     private final JavaPlugin plugin;

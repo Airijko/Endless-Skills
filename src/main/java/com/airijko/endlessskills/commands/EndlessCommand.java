@@ -1,6 +1,6 @@
-package me.airijko.endlessskills.commands;
+package com.airijko.endlessskills.commands;
 
-import me.airijko.endlessskills.gui.EndlessSkillsGUI;
+import com.airijko.endlessskills.gui.EndlessSkillsGUI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;

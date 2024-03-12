@@ -1,6 +1,6 @@
-package me.airijko.endlessskills.combat;
+package com.airijko.endlessskills.combat;
 
-import me.airijko.endlessskills.managers.ConfigManager;
+import com.airijko.endlessskills.managers.ConfigManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;

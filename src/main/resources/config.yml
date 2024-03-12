@@ -4,7 +4,7 @@ skill_attributes:
   strength: 0.5
   tenacity:
     knock_back_resistance: 0.003
-    toughness: 0.125
+    toughness: 0.25
   haste:
     attack_speed: 0.02
     movement_speed: 0.001
@@ -18,3 +18,11 @@ damage_hologram_enabled: true
 
 # Setting for enabling/disabling the xp gain from blocks
 gain_xp_from_blocks: true
+
+# Setting for strength value percentage for each item
+weapon_strength_value:
+  bow: 0.4
+  sword: 1.0
+  axe: 1.0
+  trident: 1.0
+  none: 0.1
